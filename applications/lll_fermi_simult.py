@@ -50,10 +50,9 @@ Spin = Observable("S", S)
 print("[L, S^2] = 0: ",S.commutes(H0))
 print("[Hint, S^2] = 0: ",S.commutes(Hint))
 
-#alpha = np.linspace(np.finfo(float).eps, 0.5, 30)
-alpha = np.linspace(-1., 1., 100)
+alpha = np.linspace(np.finfo(float).eps, 0.5, 30)
 
-eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [-0.25]], M=300, simult_obs=Spin, simult_seed=[2j, 6j])
+eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [1.]], M=30, simult_obs=Spin, simult_seed=[2j, 6j])
 
 eigsys.add_observable(name="L", op=H0)
 eigsys.add_observable(name="Eint", op=Hint)

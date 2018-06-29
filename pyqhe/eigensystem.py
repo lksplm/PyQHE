@@ -54,8 +54,9 @@ class Eigensystem:
                         tmp_eige[Ms*i:Ms*(i+1)] = eige_cmplx.real
                         eig_simult[Ms*i:Ms*(i+1)] = eige_cmplx.imag
                         tmp_state[:,Ms*i:Ms*(i+1)] = eigs
-                    eige, eigs = tmp_eige, tmp_state
-                    simult_ev[(slice(None),) + j] = eig_simult
+                    sort_idx = np.argsort(tmp_eige) #sort values for one paramter along energy, otherwise scrambled by differnet seeds
+                    eige, eigs = tmp_eige[sort_idx], tmp_state[:,sort_idx]
+                    simult_ev[(slice(None),) + j] = eig_simult[sort_idx]
             else:
                 if full:
                     eige, eigs = np.linalg.eigh(H.todense())

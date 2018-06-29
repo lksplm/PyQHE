@@ -4,35 +4,83 @@ import matplotlib.pyplot as plt
 from itertools import product
 from math import sqrt, factorial
 from pyqhe.basis import BasisFermi
-from pyqhe.hamiltonian import OperatorLin, OperatorQuad, Solve
-#from util import hinton_nolabel, hinton_fast
+from pyqhe.hamiltonian import OperatorLinCy, OperatorQuadCy, OperatorQuadDeltaCy
+from pyqhe.util import hinton_fast, spectrum_spin
+from pyqhe.eigensystem import Eigensystem, Observable
+import pickle
 
-basis = BasisFermi(N=[2,2], m=[8,8])
-#basis.print_states()
+basis = BasisFermi(N=[3,2], m=[10,10])
 
 diag_sites = [(i,i) for i in range(basis.m[0])]
-coeff_l = lambda i, j: i*(i==j)
-H0 = OperatorLin(basis, site_indices=diag_sites, spin_indices=[(0,0), (1,1)], op_func=coeff_l)
-
-#hinton_fast(H0.dense)
+coeff_l = lambda i, j, s, p: i*(i==j)
+H0 = OperatorLinCy(basis, site_indices=diag_sites, spin_indices=[(0,0), (1,1)], op_func=coeff_l)
 
 print("H0 hermitian: ",H0.is_hermitian())
 int_sites = [(j,k,l,m) for j,k,l,m in product(range(basis.m[0]), repeat=4) if j+k-l-m==0]
-
-
 def Vint(j, k, l, m):
     return factorial(j + k) / (2 ** (j + k) * sqrt(factorial(j) * factorial(k) * factorial(l) * factorial(m)))
 
-Hint = OperatorQuad(basis, site_indices=int_sites, spin_indices=[(0,1,1,0), (1,0,0,1)], op_func=Vint)
+coeff = np.zeros((basis.m[0],basis.m[0],basis.m[0],basis.m[0]), dtype=np.float64)
+for j, k, l, m in int_sites:
+    coeff[j, k, l, m] = Vint(j, k, l, m)
+
+Hint = OperatorQuadDeltaCy(basis, coeff=coeff)
 print("Hint hermitian: ",Hint.is_hermitian())
 
-#hinton_nolabel(Hint.dense)
+p_sites = [(i,i+2) for i in range(basis.m[0]-2)]+[(i+2,i) for i in range(basis.m[0]-2)]
+coeff_p = lambda i, j, s, p: np.sqrt((min(i,j)+1)*(min(i,j)+2))
+Hpa = OperatorLinCy(basis, site_indices=p_sites, spin_indices=[(0,0)], op_func=coeff_p)
+Hpb = OperatorLinCy(basis, site_indices=p_sites, spin_indices=[(1,1)], op_func=coeff_p)
+Hp = Hpa + Hpb
+del Hpa, Hpb
+print("Hp hermitian: ",Hp.is_hermitian())
 
-alpha = np.linspace(0.01, 0.5, 30)
-energies, states = Solve(ops_list=[H0, Hint], param_list=[[0.25], alpha], M=5, full=True)
+Sa = OperatorLinCy(basis, site_indices=diag_sites, spin_indices=[(0,0)], op_func=1.)
+s_sites = [(p,k,k,p) for k,p in product(range(basis.m[0]), repeat=2)]
+Sb = OperatorQuadCy(basis, site_indices=s_sites, spin_indices=[(1,0,1,0)], op_func_site=1., op_func_spin=1.)
+S = Sa + Sb
+Sop = Observable("S", S)
+print("S hermitian: ",S.is_hermitian())
+print("[L, S^2] = 0: ",S.commutes(H0))
+print("[Hint, S^2] = 0: ",S.commutes(Hint))
 
-print(energies.shape)
-plt.figure()
-for i in range(4):
-    plt.plot(alpha, energies[i,:].T)
+print("Starting diagonalisation...", flush=True)
+
+alpha = np.linspace(np.finfo(float).eps, 0.5, 30)
+eps = np.linspace(np.finfo(float).eps, 0.1, 100)
+#eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.25], eps], M=10)
+#eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=100)
+eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=10, simult_obs=Sop, simult_seed=[0.75j, 3.75j]) #
+
+eigsys.add_observable(name="L", op=H0)
+eigsys.add_observable(name="Eint", op=Hint)
+#eigsys.add_observable(name="S", op=S)
+
+L = eigsys.get_observable("L")
+Eint = eigsys.get_observable("Eint")
+Spin = eigsys.get_observable("S")
+
+_, ax = eigsys.plot_observable("E")
+ax.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
+ax.set_xlabel(r'$\alpha$')
+ax.set_ylabel(r'$E$')
+
+_, ax2 = eigsys.plot_observable("L")
+ax2.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
+ax2.set_xlabel(r'$\alpha$')
+ax2.set_ylabel(r'$L$')
+
+_, ax3 = eigsys.plot_observable("S", Mshow=10)
+ax3.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
+ax3.set_xlabel(r'$\alpha$')
+ax3.set_ylabel(r'$S$')
+
+print(Spin)
+Sz = 0.5*(basis.N[1]-basis.N[0])
+
+f, ax4 = spectrum_spin(L, Eint, Spin+Sz*(Sz+1), integer=False)
+
 plt.show()
+
+#savedict = {'states': basis.states, 'Ltot': L, 'GndSts': eigsys.states, 'Esys': eigsys}
+#pickle.dump(savedict,open("results/result_pert_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), "wb" ))

@@ -242,3 +242,67 @@ def quadratic_delta(data_type_t [:,:] basis, np.float64_t [:,:,:,:] coeff, np.ui
                                             val.push_back(coeff[m,l,k,j]*f1*f2*f3*f4)
 
     return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))
+
+@cython.boundscheck(False) # turn off bounds-checking for entire function
+@cython.wraparound(False)  # turn off negative index wrapping for entire function
+def density_matrix(data_type_t [:,:] basis, np.int32 spin1, np.int32 spin2, np.uint32_t Ldwn):
+    """
+    Computes a Hamiltonian of the special form
+    sum_basis  delta(j+k-l-m) b^dagger_j_sig1 b^dagger_k_sig2  b_l_sig2, b_l_sig1 |state>
+    :param basis: all basis states, shape [Nstates, mtotal]
+    :param coeff: table of coefficients for site dof, indexed via (j,k,l,m) shape [m,m,m,m]
+    :param Ldwn: cutoff for one spin sector
+    :return:
+    """
+    cdef Py_ssize_t Nstates = basis.shape[0]
+    cdef Py_ssize_t L = basis.shape[1]
+    cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+
+    lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))
+    cdef dict cy_lut = lut
+
+    state_np =  np.zeros(L, dtype=data_type)
+    sp_np =  np.zeros(L, dtype=data_type)
+    spp_np =  np.zeros(L, dtype=data_type)
+    cdef data_type_t [:] state = state_np
+    cdef data_type_t [:] sp = sp_np
+    cdef data_type_t [:] spp = spp_np
+
+    cdef vector[int] row, col
+    cdef vector[double] val
+
+    row.reserve(L*Nstates)
+    col.reserve(L*Nstates)
+    val.reserve(L*Nstates)
+
+    for i in range(Nstates):
+        state[:] = basis[i,:]
+        for sig1 in range(2):
+            for sig2 in range(2):
+                if sig1!=sig2:
+                    for j in range(Ldwn):
+                        for k in range(Ldwn):
+                            sp[:] = state
+                            #print('sp b',j,k, tuple(sp))
+                            #check if two states j and k are occupied
+                            f1 = c_(sp, j, sig1, Ldwn)
+                            f2 = c_(sp, k, sig2, Ldwn)
+                            if f1!=0 and f2 !=0:
+                                #print('sp', j,k, tuple(sp))
+                                for l in range(Ldwn):
+                                    spp[:] = sp
+                                    m = j+k-l
+                                    if m>=0 and m<Ldwn:
+                                        #print('spp b', l ,m, tuple(spp))
+                                        f3 = c_dagger(spp, l, sig2, Ldwn)
+                                        f4 = c_dagger(spp, m, sig1, Ldwn)
+
+                                        if f3!=0 and f4 !=0:
+                                            #print('spp', l ,m, tuple(spp))
+                                            idx = cy_lut[tuple(spp)]
+                                            #print(i, idx)
+                                            row.push_back(i)
+                                            col.push_back(idx)
+                                            val.push_back(coeff[m,l,k,j]*f1*f2*f3*f4)
+
+    return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))

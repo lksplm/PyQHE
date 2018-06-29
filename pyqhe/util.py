@@ -2,6 +2,49 @@ from matplotlib import cm
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap, BoundaryNorm
+
+def spectrum_spin(L, Eint, S, ax=None, integer=True):
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+    else:
+        fig = None
+
+    Splt = S.copy()
+    Splt[np.isnan(Splt)] = -1
+    Splt[np.abs(Splt) < 1.e-5] = 0
+    if integer:
+        Splt = np.array(np.round(Splt), dtype=np.int)
+    else:
+        Splt = np.round(Splt, 5)
+    Slbl = np.unique(Splt)
+    print(Slbl)
+    Splt2 = Splt.copy()
+    for i, spi in enumerate(Slbl):
+        Splt[Splt2 == spi] = i
+
+    cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    marker = ['^', 'v', '*', 's', '+', 'X', 'h', 'o', 'p']
+    cmap = ListedColormap(cycle)
+    norm = BoundaryNorm(np.arange(len(Slbl) + 1) - 0.5, ncolors=len(Slbl))
+
+    if Splt.dtype== np.int:
+        legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker=marker[i], label='S={:d}'.format(s)) for i, s in
+                       enumerate(Slbl)]
+    else:
+        legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker=marker[i], label='S={:.3f}'.format(s)) for i, s in
+                           enumerate(Slbl)]
+
+    for i, s in enumerate(Slbl):
+        idx = (Splt == i)
+        ax.scatter(L[idx], Eint[idx], c=Splt[idx], marker=marker[i], facecolor='none', alpha=0.5, cmap=cmap,
+                    norm=norm)
+    ax.legend(handles=legend_elements)
+
+    return fig, ax
+
+
 # Adopted from the SciPy Cookbook.
 def _blob(x, y, w, w_max, area, cmap=None):
     """
