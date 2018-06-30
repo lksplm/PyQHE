@@ -7,7 +7,7 @@ import numpy as np
 
 from pyqhe.basis import BasisFermi
 from pyqhe.hamiltonian import OperatorLin, OperatorQuad
-from pyqhe.util import hinton_fast
+from pyqhe.plotting import hinton_fast
 
 N=2
 L=8

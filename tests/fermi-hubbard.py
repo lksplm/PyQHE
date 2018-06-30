@@ -3,7 +3,7 @@ import numpy as np
 
 from pyqhe.basis import BasisFermi
 from pyqhe.hamiltonian import OperatorLin, OperatorQuad, Solve
-from pyqhe.util import hinton_fast
+from pyqhe.plotting import hinton_fast
 
 L=4
 J=1.0

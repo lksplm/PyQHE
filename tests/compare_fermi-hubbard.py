@@ -7,7 +7,7 @@ import numpy as np
 
 from pyqhe.basis import BasisFermi
 from pyqhe.hamiltonian import OperatorLin, OperatorQuad
-from pyqhe.util import hinton_fast
+from pyqhe.plotting import hinton_fast
 from pyqhe.eigensystem import Eigensystem
 
 def solve_pyqhe(N=2, L=4, J=1.0, U=1.0, mu=0.01):

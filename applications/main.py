@@ -5,7 +5,7 @@ from itertools import product
 from math import sqrt, factorial
 from pyqhe.basis import BasisFermi
 from pyqhe.hamiltonian import OperatorLinCy, OperatorQuadCy, OperatorQuadDeltaCy
-from pyqhe.util import hinton_fast, spectrum_spin
+from pyqhe.plotting import hinton_fast, spectrum_spin, energy_spin
 from pyqhe.eigensystem import Eigensystem, Observable
 import pickle
 
@@ -55,8 +55,12 @@ eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=10, simu
 eigsys.add_observable(name="L", op=H0)
 eigsys.add_observable(name="Eint", op=Hint)
 #eigsys.add_observable(name="S", op=S)
+#Modify spin
+Sz = 0.5*(basis.N[1]-basis.N[0])
+eigsys.Observables["S"].eigenvalues = -0.5+np.sqrt(0.25+(eigsys.Observables["S"].eigenvalues+Sz*(Sz+1)))
 
 L = eigsys.get_observable("L")
+Eall = eigsys.get_observable("E")
 Eint = eigsys.get_observable("Eint")
 Spin = eigsys.get_observable("S")
 
@@ -76,9 +80,9 @@ ax3.set_xlabel(r'$\alpha$')
 ax3.set_ylabel(r'$S$')
 
 print(Spin)
-Sz = 0.5*(basis.N[1]-basis.N[0])
 
-f, ax4 = spectrum_spin(L, Eint, Spin+Sz*(Sz+1), integer=False)
+_, ax4 = spectrum_spin(L, Eint, Spin, integer=False)
+_, ax5 = energy_spin(alpha, L, Eall, Spin, integer=False)
 
 plt.show()
 

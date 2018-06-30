@@ -4,6 +4,62 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
+from fractions import Fraction
+
+def format_spin(s):
+    """
+    Format a spin (multiples of 0.5) as a fraction n/2 for nice display
+    :param s: float number
+    :return: string "n/2"
+    """
+    f = Fraction(int(s*2), 2)
+    return "{:d}/{:d}".format(f.numerator, f.denominator)
+
+def energy_spin(alpha, L, E, S, Mshow=10, ax=None, integer=True):
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+    else:
+        fig = None
+
+    Splt = S.copy()
+    Splt[np.isnan(Splt)] = -1
+    Splt[np.abs(Splt) < 1.e-5] = 0
+    if integer:
+        Splt = np.array(np.round(Splt), dtype=np.int)
+    else:
+        Splt = np.round(Splt, 5)
+    Slbl = np.unique(Splt)
+    print(Slbl)
+    Splt2 = Splt.copy()
+    for i, spi in enumerate(Slbl):
+        Splt[Splt2 == spi] = i
+
+    cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    cmap = ListedColormap(cycle)
+    norm = BoundaryNorm(np.arange(len(Slbl) + 1) - 0.5, ncolors=len(Slbl))
+
+    if Splt.dtype== np.int:
+        legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker='o', label='S={:d}'.format(s)) for i, s in
+                       enumerate(Slbl)]
+    else:
+        legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker='o', label='S={}'.format(format_spin(s))) for i, s in
+                           enumerate(Slbl)]
+
+    for i in range(Mshow):
+        e = E[i, :, 0]
+        s = Splt[i, :, 0]
+        points = np.array([alpha, e]).T.reshape(-1, 1, 2)
+        segments = np.concatenate([points[:-1], points[1:]], axis=1)
+        lc = LineCollection(segments, cmap=cmap, norm=norm)
+        lc.set_array(s)
+        lc.set_linewidth(1.0)
+        plt.gca().add_collection(lc)
+
+    ax.set_xlim(alpha.min(), alpha.max())
+    ax.set_ylim(0, 1.2*E.max())  # 2:3.5, 3: 6.5, 4:10.5
+    ax.legend(handles=legend_elements)
+
+    return fig, ax
 
 def spectrum_spin(L, Eint, S, ax=None, integer=True):
     if ax is None:
@@ -33,7 +89,7 @@ def spectrum_spin(L, Eint, S, ax=None, integer=True):
         legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker=marker[i], label='S={:d}'.format(s)) for i, s in
                        enumerate(Slbl)]
     else:
-        legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker=marker[i], label='S={:.3f}'.format(s)) for i, s in
+        legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker=marker[i], label='S={}'.format(format_spin(s))) for i, s in
                            enumerate(Slbl)]
 
     for i, s in enumerate(Slbl):
@@ -43,7 +99,6 @@ def spectrum_spin(L, Eint, S, ax=None, integer=True):
     ax.legend(handles=legend_elements)
 
     return fig, ax
-
 
 # Adopted from the SciPy Cookbook.
 def _blob(x, y, w, w_max, area, cmap=None):

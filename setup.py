@@ -5,6 +5,7 @@ import numpy as np
 
 extensions = [
     Extension('pyqhe.cython.hamiltonian_cy', ['pyqhe/cython/hamiltonian_cy.pyx'], include_dirs = [np.get_include()],language="c++"),
+    Extension('pyqhe.cython.hamiltonian_bose_cy', ['pyqhe/cython/hamiltonian_bose_cy.pyx'], include_dirs = [np.get_include()],language="c++"),
     ]
 
 

@@ -604,8 +604,6 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include "stdexcept"
 #include "typeinfo"
 #include <vector>
-#include <utility>
-#include <unordered_map>
 #include "pythread.h"
 #include <stdlib.h>
 #include "pystate.h"
@@ -1137,7 +1135,7 @@ typedef npy_double __pyx_t_5numpy_double_t;
  */
 typedef npy_longdouble __pyx_t_5numpy_longdouble_t;
 
-/* "pyqhe/cython/hamiltonian_cy.pyx":13
+/* "pyqhe/cython/hamiltonian_cy.pyx":10
  * 
  * data_type = np.uint8
  * ctypedef np.uint8_t data_type_t             # <<<<<<<<<<<<<<
@@ -1499,6 +1497,35 @@ static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key);
 #define __Pyx_PyObject_Dict_GetItem(obj, name)  PyObject_GetItem(obj, name)
 #endif
 
+/* GetItemInt.proto */
+#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
+    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
+               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
+#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
+                                                     int is_list, int wraparound, int boundscheck);
+
+/* ObjectGetItem.proto */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key);
+#else
+#define __Pyx_PyObject_GetItem(obj, key)  PyObject_GetItem(obj, key)
+#endif
+
 /* PyThreadStateGet.proto */
 #if CYTHON_FAST_THREAD_STATE
 #define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
@@ -1627,35 +1654,6 @@ static CYTHON_UNUSED int __pyx_array_getbuffer(PyObject *__pyx_v_self, Py_buffer
 static PyObject *__pyx_array_get_memview(struct __pyx_array_obj *); /*proto*/
 /* GetAttr.proto */
 static CYTHON_INLINE PyObject *__Pyx_GetAttr(PyObject *, PyObject *);
-
-/* GetItemInt.proto */
-#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
-    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
-               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
-#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
-                                                     int is_list, int wraparound, int boundscheck);
-
-/* ObjectGetItem.proto */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key);
-#else
-#define __Pyx_PyObject_GetItem(obj, key)  PyObject_GetItem(obj, key)
-#endif
 
 /* decode_c_string_utf16.proto */
 static CYTHON_INLINE PyObject *__Pyx_PyUnicode_DecodeUTF16(const char *s, Py_ssize_t size, const char *errors) {
@@ -1872,6 +1870,9 @@ static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_n
 /* ObjectToMemviewSlice.proto */
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(PyObject *, int writable_flag);
 
+/* ObjectToMemviewSlice.proto */
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5numpy_float64_t(PyObject *, int writable_flag);
+
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_npy_uint32(npy_uint32 value);
 
@@ -2048,6 +2049,9 @@ static CYTHON_INLINE npy_uint32 __Pyx_PyInt_As_npy_uint32(PyObject *);
 static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *);
 
 /* CIntFromPy.proto */
+static CYTHON_INLINE npy_int32 __Pyx_PyInt_As_npy_int32(PyObject *);
+
+/* CIntFromPy.proto */
 static CYTHON_INLINE npy_uint8 __Pyx_PyInt_As_npy_uint8(PyObject *);
 
 /* CIntFromPy.proto */
@@ -2128,12 +2132,6 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, cha
 /* Module declarations from 'cython' */
 
 /* Module declarations from 'libcpp.vector' */
-
-/* Module declarations from 'libcpp' */
-
-/* Module declarations from 'libcpp.utility' */
-
-/* Module declarations from 'libcpp.unordered_map' */
 
 /* Module declarations from 'pyqhe.cython.hamiltonian_cy' */
 static PyTypeObject *__pyx_array_type = 0;
@@ -2226,7 +2224,9 @@ static const char __pyx_k_lut[] = "lut";
 static const char __pyx_k_map[] = "map";
 static const char __pyx_k_new[] = "__new__";
 static const char __pyx_k_obj[] = "obj";
+static const char __pyx_k_rho[] = "rho";
 static const char __pyx_k_row[] = "row";
+static const char __pyx_k_sig[] = "sig";
 static const char __pyx_k_sp0[] = "sp0";
 static const char __pyx_k_sp1[] = "sp1";
 static const char __pyx_k_sp2[] = "sp2";
@@ -2298,6 +2298,7 @@ static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_quadratic[] = "quadratic";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
+static const char __pyx_k_state_vec[] = "state_vec";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_coeff_site[] = "coeff_site";
@@ -2316,6 +2317,7 @@ static const char __pyx_k_spin_indices[] = "spin_indices";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
+static const char __pyx_k_density_matrix[] = "density_matrix";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
@@ -2324,6 +2326,7 @@ static const char __pyx_k_quadratic_delta[] = "quadratic_delta";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_density_matrix_two[] = "density_matrix_two";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
@@ -2407,6 +2410,8 @@ static PyObject *__pyx_kp_s_contiguous_and_indirect;
 static PyObject *__pyx_n_s_coo_matrix;
 static PyObject *__pyx_n_s_cy_lut;
 static PyObject *__pyx_n_s_data_type;
+static PyObject *__pyx_n_s_density_matrix;
+static PyObject *__pyx_n_s_density_matrix_two;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_dtype;
 static PyObject *__pyx_n_s_dtype_is_object;
@@ -2470,11 +2475,13 @@ static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
+static PyObject *__pyx_n_s_rho;
 static PyObject *__pyx_n_s_row;
 static PyObject *__pyx_n_s_scipy_sparse;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
+static PyObject *__pyx_n_s_sig;
 static PyObject *__pyx_n_s_sig1;
 static PyObject *__pyx_n_s_sig2;
 static PyObject *__pyx_n_s_site_indices;
@@ -2496,6 +2503,7 @@ static PyObject *__pyx_n_s_st3;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_state;
 static PyObject *__pyx_n_s_state_np;
+static PyObject *__pyx_n_s_state_vec;
 static PyObject *__pyx_n_s_step;
 static PyObject *__pyx_n_s_stop;
 static PyObject *__pyx_kp_s_strided_and_direct;
@@ -2519,6 +2527,8 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_4c_(CYTHON_UNUSED PyOb
 static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_basis, __Pyx_memviewslice __pyx_v_site_indices, __Pyx_memviewslice __pyx_v_spin_indices, __Pyx_memviewslice __pyx_v_coeff, __pyx_t_5numpy_uint32_t __pyx_v_Ldwn); /* proto */
 static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_basis, __Pyx_memviewslice __pyx_v_site_indices, __Pyx_memviewslice __pyx_v_spin_indices, __Pyx_memviewslice __pyx_v_coeff_site, __Pyx_memviewslice __pyx_v_coeff_spin, __pyx_t_5numpy_uint32_t __pyx_v_Ldwn); /* proto */
 static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_basis, __Pyx_memviewslice __pyx_v_coeff, __pyx_t_5numpy_uint32_t __pyx_v_Ldwn); /* proto */
+static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_12density_matrix(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_state_vec, __Pyx_memviewslice __pyx_v_basis, __pyx_t_5numpy_int32_t __pyx_v_sig, __pyx_t_5numpy_uint32_t __pyx_v_Ldwn); /* proto */
+static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_14density_matrix_two(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_state_vec, __Pyx_memviewslice __pyx_v_basis, __pyx_t_5numpy_int32_t __pyx_v_sig1, __pyx_t_5numpy_int32_t __pyx_v_sig2, __pyx_t_5numpy_uint32_t __pyx_v_Ldwn); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
@@ -2605,18 +2615,22 @@ static PyObject *__pyx_tuple__31;
 static PyObject *__pyx_tuple__33;
 static PyObject *__pyx_tuple__35;
 static PyObject *__pyx_tuple__37;
-static PyObject *__pyx_tuple__38;
 static PyObject *__pyx_tuple__39;
-static PyObject *__pyx_tuple__40;
 static PyObject *__pyx_tuple__41;
 static PyObject *__pyx_tuple__42;
+static PyObject *__pyx_tuple__43;
+static PyObject *__pyx_tuple__44;
+static PyObject *__pyx_tuple__45;
+static PyObject *__pyx_tuple__46;
 static PyObject *__pyx_codeobj__32;
 static PyObject *__pyx_codeobj__34;
 static PyObject *__pyx_codeobj__36;
-static PyObject *__pyx_codeobj__43;
+static PyObject *__pyx_codeobj__38;
+static PyObject *__pyx_codeobj__40;
+static PyObject *__pyx_codeobj__47;
 /* Late includes */
 
-/* "pyqhe/cython/hamiltonian_cy.pyx":17
+/* "pyqhe/cython/hamiltonian_cy.pyx":14
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef inline int sign(data_type_t [:] state, np.uint32_t i) nogil:             # <<<<<<<<<<<<<<
@@ -2634,7 +2648,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__Pyx_memv
   __pyx_t_5numpy_uint32_t __pyx_t_3;
   size_t __pyx_t_4;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":18
+  /* "pyqhe/cython/hamiltonian_cy.pyx":15
  * @cython.wraparound(False)
  * cpdef inline int sign(data_type_t [:] state, np.uint32_t i) nogil:
  *     cdef int sign = 0             # <<<<<<<<<<<<<<
@@ -2643,7 +2657,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__Pyx_memv
  */
   __pyx_v_sign = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":19
+  /* "pyqhe/cython/hamiltonian_cy.pyx":16
  * cpdef inline int sign(data_type_t [:] state, np.uint32_t i) nogil:
  *     cdef int sign = 0
  *     for j in range(i):             # <<<<<<<<<<<<<<
@@ -2655,7 +2669,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__Pyx_memv
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_j = __pyx_t_3;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":20
+    /* "pyqhe/cython/hamiltonian_cy.pyx":17
  *     cdef int sign = 0
  *     for j in range(i):
  *         sign += state[j]             # <<<<<<<<<<<<<<
@@ -2666,7 +2680,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__Pyx_memv
     __pyx_v_sign = (__pyx_v_sign + (*((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_4 * __pyx_v_state.strides[0]) ))));
   }
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":21
+  /* "pyqhe/cython/hamiltonian_cy.pyx":18
  *     for j in range(i):
  *         sign += state[j]
  *     return (-1)**sign             # <<<<<<<<<<<<<<
@@ -2676,7 +2690,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__Pyx_memv
   __pyx_r = __Pyx_pow_long(-1L, ((long)__pyx_v_sign));
   goto __pyx_L0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":17
+  /* "pyqhe/cython/hamiltonian_cy.pyx":14
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef inline int sign(data_type_t [:] state, np.uint32_t i) nogil:             # <<<<<<<<<<<<<<
@@ -2720,11 +2734,11 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_1sign(PyObject *__pyx_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_i)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("sign", 1, 2, 2, 1); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("sign", 1, 2, 2, 1); __PYX_ERR(0, 14, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "sign") < 0)) __PYX_ERR(0, 17, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "sign") < 0)) __PYX_ERR(0, 14, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2732,12 +2746,12 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_1sign(PyObject *__pyx_
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_state = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_state.memview)) __PYX_ERR(0, 17, __pyx_L3_error)
-    __pyx_v_i = __Pyx_PyInt_As_npy_uint32(values[1]); if (unlikely((__pyx_v_i == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L3_error)
+    __pyx_v_state = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_state.memview)) __PYX_ERR(0, 14, __pyx_L3_error)
+    __pyx_v_i = __Pyx_PyInt_As_npy_uint32(values[1]); if (unlikely((__pyx_v_i == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("sign", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("sign", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 14, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.sign", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2756,8 +2770,8 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_sign(CYTHON_UNUSED PyO
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("sign", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_state.memview)) { __Pyx_RaiseUnboundLocalError("state"); __PYX_ERR(0, 17, __pyx_L1_error) }
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__pyx_v_state, __pyx_v_i, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  if (unlikely(!__pyx_v_state.memview)) { __Pyx_RaiseUnboundLocalError("state"); __PYX_ERR(0, 14, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__pyx_v_state, __pyx_v_i, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2775,17 +2789,17 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_sign(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "pyqhe/cython/hamiltonian_cy.pyx":25
+/* "pyqhe/cython/hamiltonian_cy.pyx":22
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef inline int c_dagger(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:             # <<<<<<<<<<<<<<
+ *     cdef int factor
  *     if spin==0: #spin down sector
- *         if state[i]==0:
  */
 
 static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_3c_dagger(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_memviewslice __pyx_v_state, int __pyx_v_i, int __pyx_v_spin, __pyx_t_5numpy_uint32_t __pyx_v_l, CYTHON_UNUSED int __pyx_skip_dispatch) {
-  long __pyx_v_factor;
+  int __pyx_v_factor;
   int __pyx_r;
   Py_ssize_t __pyx_t_1;
   int __pyx_t_2;
@@ -2793,9 +2807,9 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
   size_t __pyx_t_4;
   size_t __pyx_t_5;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":26
- * @cython.wraparound(False)
+  /* "pyqhe/cython/hamiltonian_cy.pyx":24
  * cpdef inline int c_dagger(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:
+ *     cdef int factor
  *     if spin==0: #spin down sector             # <<<<<<<<<<<<<<
  *         if state[i]==0:
  *             state[i]=1
@@ -2803,8 +2817,8 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
   switch (__pyx_v_spin) {
     case 0:
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":27
- * cpdef inline int c_dagger(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:
+    /* "pyqhe/cython/hamiltonian_cy.pyx":25
+ *     cdef int factor
  *     if spin==0: #spin down sector
  *         if state[i]==0:             # <<<<<<<<<<<<<<
  *             state[i]=1
@@ -2814,7 +2828,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
     __pyx_t_2 = (((*((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_1 * __pyx_v_state.strides[0]) ))) == 0) != 0);
     if (__pyx_t_2) {
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":28
+      /* "pyqhe/cython/hamiltonian_cy.pyx":26
  *     if spin==0: #spin down sector
  *         if state[i]==0:
  *             state[i]=1             # <<<<<<<<<<<<<<
@@ -2824,7 +2838,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
       __pyx_t_3 = __pyx_v_i;
       *((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_3 * __pyx_v_state.strides[0]) )) = 1;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":29
+      /* "pyqhe/cython/hamiltonian_cy.pyx":27
  *         if state[i]==0:
  *             state[i]=1
  *             factor = sign(state,i)#(-1)**np.sum(state[0:i])             # <<<<<<<<<<<<<<
@@ -2833,8 +2847,8 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
  */
       __pyx_v_factor = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__pyx_v_state, __pyx_v_i, 0);
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":27
- * cpdef inline int c_dagger(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:
+      /* "pyqhe/cython/hamiltonian_cy.pyx":25
+ *     cdef int factor
  *     if spin==0: #spin down sector
  *         if state[i]==0:             # <<<<<<<<<<<<<<
  *             state[i]=1
@@ -2843,7 +2857,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
       goto __pyx_L3;
     }
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":31
+    /* "pyqhe/cython/hamiltonian_cy.pyx":29
  *             factor = sign(state,i)#(-1)**np.sum(state[0:i])
  *         else:
  *             factor=0             # <<<<<<<<<<<<<<
@@ -2855,16 +2869,16 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
     }
     __pyx_L3:;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":26
- * @cython.wraparound(False)
+    /* "pyqhe/cython/hamiltonian_cy.pyx":24
  * cpdef inline int c_dagger(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:
+ *     cdef int factor
  *     if spin==0: #spin down sector             # <<<<<<<<<<<<<<
  *         if state[i]==0:
  *             state[i]=1
  */
     break;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":33
+    /* "pyqhe/cython/hamiltonian_cy.pyx":31
  *             factor=0
  * 
  *     elif spin==1: #spin up sector             # <<<<<<<<<<<<<<
@@ -2873,7 +2887,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
  */
     case 1:
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":34
+    /* "pyqhe/cython/hamiltonian_cy.pyx":32
  * 
  *     elif spin==1: #spin up sector
  *         if state[l+i]==0:             # <<<<<<<<<<<<<<
@@ -2884,7 +2898,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
     __pyx_t_2 = (((*((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_4 * __pyx_v_state.strides[0]) ))) == 0) != 0);
     if (__pyx_t_2) {
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":35
+      /* "pyqhe/cython/hamiltonian_cy.pyx":33
  *     elif spin==1: #spin up sector
  *         if state[l+i]==0:
  *             state[l+i]=1             # <<<<<<<<<<<<<<
@@ -2894,7 +2908,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
       __pyx_t_5 = (__pyx_v_l + __pyx_v_i);
       *((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_5 * __pyx_v_state.strides[0]) )) = 1;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":36
+      /* "pyqhe/cython/hamiltonian_cy.pyx":34
  *         if state[l+i]==0:
  *             state[l+i]=1
  *             factor = sign(state,i+l)             # <<<<<<<<<<<<<<
@@ -2903,7 +2917,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
  */
       __pyx_v_factor = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_sign(__pyx_v_state, (__pyx_v_i + __pyx_v_l), 0);
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":34
+      /* "pyqhe/cython/hamiltonian_cy.pyx":32
  * 
  *     elif spin==1: #spin up sector
  *         if state[l+i]==0:             # <<<<<<<<<<<<<<
@@ -2913,7 +2927,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
       goto __pyx_L4;
     }
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":38
+    /* "pyqhe/cython/hamiltonian_cy.pyx":36
  *             factor = sign(state,i+l)
  *         else:
  *             factor=0             # <<<<<<<<<<<<<<
@@ -2925,7 +2939,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
     }
     __pyx_L4:;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":33
+    /* "pyqhe/cython/hamiltonian_cy.pyx":31
  *             factor=0
  * 
  *     elif spin==1: #spin up sector             # <<<<<<<<<<<<<<
@@ -2936,7 +2950,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
     default: break;
   }
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":39
+  /* "pyqhe/cython/hamiltonian_cy.pyx":37
  *         else:
  *             factor=0
  *     return factor             # <<<<<<<<<<<<<<
@@ -2946,12 +2960,12 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__Pyx_
   __pyx_r = __pyx_v_factor;
   goto __pyx_L0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":25
+  /* "pyqhe/cython/hamiltonian_cy.pyx":22
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef inline int c_dagger(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:             # <<<<<<<<<<<<<<
+ *     cdef int factor
  *     if spin==0: #spin down sector
- *         if state[i]==0:
  */
 
   /* function exit code */
@@ -2996,23 +3010,23 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_3c_dagger(PyObject *__
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_i)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("c_dagger", 1, 4, 4, 1); __PYX_ERR(0, 25, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("c_dagger", 1, 4, 4, 1); __PYX_ERR(0, 22, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_spin)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("c_dagger", 1, 4, 4, 2); __PYX_ERR(0, 25, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("c_dagger", 1, 4, 4, 2); __PYX_ERR(0, 22, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_l)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("c_dagger", 1, 4, 4, 3); __PYX_ERR(0, 25, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("c_dagger", 1, 4, 4, 3); __PYX_ERR(0, 22, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_dagger") < 0)) __PYX_ERR(0, 25, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_dagger") < 0)) __PYX_ERR(0, 22, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -3022,14 +3036,14 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_3c_dagger(PyObject *__
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
-    __pyx_v_state = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_state.memview)) __PYX_ERR(0, 25, __pyx_L3_error)
-    __pyx_v_i = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_i == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 25, __pyx_L3_error)
-    __pyx_v_spin = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_spin == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 25, __pyx_L3_error)
-    __pyx_v_l = __Pyx_PyInt_As_npy_uint32(values[3]); if (unlikely((__pyx_v_l == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 25, __pyx_L3_error)
+    __pyx_v_state = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_state.memview)) __PYX_ERR(0, 22, __pyx_L3_error)
+    __pyx_v_i = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_i == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L3_error)
+    __pyx_v_spin = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_spin == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L3_error)
+    __pyx_v_l = __Pyx_PyInt_As_npy_uint32(values[3]); if (unlikely((__pyx_v_l == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("c_dagger", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 25, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("c_dagger", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 22, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.c_dagger", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3048,8 +3062,8 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_2c_dagger(CYTHON_UNUSE
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("c_dagger", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_state.memview)) { __Pyx_RaiseUnboundLocalError("state"); __PYX_ERR(0, 25, __pyx_L1_error) }
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_state, __pyx_v_i, __pyx_v_spin, __pyx_v_l, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  if (unlikely(!__pyx_v_state.memview)) { __Pyx_RaiseUnboundLocalError("state"); __PYX_ERR(0, 22, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_state, __pyx_v_i, __pyx_v_spin, __pyx_v_l, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3067,17 +3081,17 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_2c_dagger(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "pyqhe/cython/hamiltonian_cy.pyx":43
+/* "pyqhe/cython/hamiltonian_cy.pyx":41
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef inline int c_(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:             # <<<<<<<<<<<<<<
+ *     cdef int factor
  *     if spin==0: #spin down sector
- *         if state[i]==0:
  */
 
 static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_5c_(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memviewslice __pyx_v_state, int __pyx_v_i, int __pyx_v_spin, __pyx_t_5numpy_uint32_t __pyx_v_l, CYTHON_UNUSED int __pyx_skip_dispatch) {
-  long __pyx_v_factor;
+  int __pyx_v_factor;
   int __pyx_r;
   Py_ssize_t __pyx_t_1;
   int __pyx_t_2;
@@ -3085,9 +3099,9 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
   size_t __pyx_t_4;
   size_t __pyx_t_5;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":44
- * @cython.wraparound(False)
+  /* "pyqhe/cython/hamiltonian_cy.pyx":43
  * cpdef inline int c_(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:
+ *     cdef int factor
  *     if spin==0: #spin down sector             # <<<<<<<<<<<<<<
  *         if state[i]==0:
  *             factor=0
@@ -3095,8 +3109,8 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
   switch (__pyx_v_spin) {
     case 0:
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":45
- * cpdef inline int c_(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:
+    /* "pyqhe/cython/hamiltonian_cy.pyx":44
+ *     cdef int factor
  *     if spin==0: #spin down sector
  *         if state[i]==0:             # <<<<<<<<<<<<<<
  *             factor=0
@@ -3106,7 +3120,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
     __pyx_t_2 = (((*((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_1 * __pyx_v_state.strides[0]) ))) == 0) != 0);
     if (__pyx_t_2) {
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":46
+      /* "pyqhe/cython/hamiltonian_cy.pyx":45
  *     if spin==0: #spin down sector
  *         if state[i]==0:
  *             factor=0             # <<<<<<<<<<<<<<
@@ -3115,8 +3129,8 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
  */
       __pyx_v_factor = 0;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":45
- * cpdef inline int c_(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:
+      /* "pyqhe/cython/hamiltonian_cy.pyx":44
+ *     cdef int factor
  *     if spin==0: #spin down sector
  *         if state[i]==0:             # <<<<<<<<<<<<<<
  *             factor=0
@@ -3125,7 +3139,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
       goto __pyx_L3;
     }
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":48
+    /* "pyqhe/cython/hamiltonian_cy.pyx":47
  *             factor=0
  *         else:
  *             state[i]=0             # <<<<<<<<<<<<<<
@@ -3136,7 +3150,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
       __pyx_t_3 = __pyx_v_i;
       *((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_3 * __pyx_v_state.strides[0]) )) = 0;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":49
+      /* "pyqhe/cython/hamiltonian_cy.pyx":48
  *         else:
  *             state[i]=0
  *             factor = sign(state,i)             # <<<<<<<<<<<<<<
@@ -3147,16 +3161,16 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
     }
     __pyx_L3:;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":44
- * @cython.wraparound(False)
+    /* "pyqhe/cython/hamiltonian_cy.pyx":43
  * cpdef inline int c_(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:
+ *     cdef int factor
  *     if spin==0: #spin down sector             # <<<<<<<<<<<<<<
  *         if state[i]==0:
  *             factor=0
  */
     break;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":51
+    /* "pyqhe/cython/hamiltonian_cy.pyx":50
  *             factor = sign(state,i)
  * 
  *     elif spin==1: #spin up sector             # <<<<<<<<<<<<<<
@@ -3165,7 +3179,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
  */
     case 1:
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":52
+    /* "pyqhe/cython/hamiltonian_cy.pyx":51
  * 
  *     elif spin==1: #spin up sector
  *         if state[l+i]==0:             # <<<<<<<<<<<<<<
@@ -3176,7 +3190,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
     __pyx_t_2 = (((*((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_4 * __pyx_v_state.strides[0]) ))) == 0) != 0);
     if (__pyx_t_2) {
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":53
+      /* "pyqhe/cython/hamiltonian_cy.pyx":52
  *     elif spin==1: #spin up sector
  *         if state[l+i]==0:
  *             factor=0             # <<<<<<<<<<<<<<
@@ -3185,7 +3199,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
  */
       __pyx_v_factor = 0;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":52
+      /* "pyqhe/cython/hamiltonian_cy.pyx":51
  * 
  *     elif spin==1: #spin up sector
  *         if state[l+i]==0:             # <<<<<<<<<<<<<<
@@ -3195,7 +3209,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
       goto __pyx_L4;
     }
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":55
+    /* "pyqhe/cython/hamiltonian_cy.pyx":54
  *             factor=0
  *         else:
  *             state[l+i]=0             # <<<<<<<<<<<<<<
@@ -3206,7 +3220,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
       __pyx_t_5 = (__pyx_v_l + __pyx_v_i);
       *((__pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t *) ( /* dim=0 */ (__pyx_v_state.data + __pyx_t_5 * __pyx_v_state.strides[0]) )) = 0;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":56
+      /* "pyqhe/cython/hamiltonian_cy.pyx":55
  *         else:
  *             state[l+i]=0
  *             factor = sign(state,i+l)             # <<<<<<<<<<<<<<
@@ -3217,7 +3231,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
     }
     __pyx_L4:;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":51
+    /* "pyqhe/cython/hamiltonian_cy.pyx":50
  *             factor = sign(state,i)
  * 
  *     elif spin==1: #spin up sector             # <<<<<<<<<<<<<<
@@ -3228,7 +3242,7 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
     default: break;
   }
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":57
+  /* "pyqhe/cython/hamiltonian_cy.pyx":56
  *             state[l+i]=0
  *             factor = sign(state,i+l)
  *     return factor             # <<<<<<<<<<<<<<
@@ -3238,12 +3252,12 @@ static CYTHON_INLINE int __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__Pyx_memvie
   __pyx_r = __pyx_v_factor;
   goto __pyx_L0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":43
+  /* "pyqhe/cython/hamiltonian_cy.pyx":41
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * cpdef inline int c_(data_type_t [:] state, int i, int spin, np.uint32_t l) nogil:             # <<<<<<<<<<<<<<
+ *     cdef int factor
  *     if spin==0: #spin down sector
- *         if state[i]==0:
  */
 
   /* function exit code */
@@ -3288,23 +3302,23 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_5c_(PyObject *__pyx_se
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_i)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("c_", 1, 4, 4, 1); __PYX_ERR(0, 43, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("c_", 1, 4, 4, 1); __PYX_ERR(0, 41, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_spin)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("c_", 1, 4, 4, 2); __PYX_ERR(0, 43, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("c_", 1, 4, 4, 2); __PYX_ERR(0, 41, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_l)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("c_", 1, 4, 4, 3); __PYX_ERR(0, 43, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("c_", 1, 4, 4, 3); __PYX_ERR(0, 41, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_") < 0)) __PYX_ERR(0, 43, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "c_") < 0)) __PYX_ERR(0, 41, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -3314,14 +3328,14 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_5c_(PyObject *__pyx_se
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
-    __pyx_v_state = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_state.memview)) __PYX_ERR(0, 43, __pyx_L3_error)
-    __pyx_v_i = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_i == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L3_error)
-    __pyx_v_spin = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_spin == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L3_error)
-    __pyx_v_l = __Pyx_PyInt_As_npy_uint32(values[3]); if (unlikely((__pyx_v_l == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L3_error)
+    __pyx_v_state = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_state.memview)) __PYX_ERR(0, 41, __pyx_L3_error)
+    __pyx_v_i = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_i == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 41, __pyx_L3_error)
+    __pyx_v_spin = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_spin == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 41, __pyx_L3_error)
+    __pyx_v_l = __Pyx_PyInt_As_npy_uint32(values[3]); if (unlikely((__pyx_v_l == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 41, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("c_", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 43, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("c_", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 41, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.c_", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3340,8 +3354,8 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_4c_(CYTHON_UNUSED PyOb
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("c_", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_state.memview)) { __Pyx_RaiseUnboundLocalError("state"); __PYX_ERR(0, 43, __pyx_L1_error) }
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_state, __pyx_v_i, __pyx_v_spin, __pyx_v_l, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (unlikely(!__pyx_v_state.memview)) { __Pyx_RaiseUnboundLocalError("state"); __PYX_ERR(0, 41, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_state, __pyx_v_i, __pyx_v_spin, __pyx_v_l, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3359,7 +3373,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_4c_(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "pyqhe/cython/hamiltonian_cy.pyx":63
+/* "pyqhe/cython/hamiltonian_cy.pyx":62
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def linear(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.uint32_t [:,:] spin_indices, np.float64_t [:,:,:,:] coeff, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
@@ -3409,29 +3423,29 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_7linear(PyObject *__py
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_site_indices)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, 1); __PYX_ERR(0, 63, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, 1); __PYX_ERR(0, 62, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_spin_indices)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, 2); __PYX_ERR(0, 63, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, 2); __PYX_ERR(0, 62, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_coeff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, 3); __PYX_ERR(0, 63, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, 3); __PYX_ERR(0, 62, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Ldwn)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, 4); __PYX_ERR(0, 63, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, 4); __PYX_ERR(0, 62, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "linear") < 0)) __PYX_ERR(0, 63, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "linear") < 0)) __PYX_ERR(0, 62, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -3442,15 +3456,15 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_7linear(PyObject *__py
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
     }
-    __pyx_v_basis = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_basis.memview)) __PYX_ERR(0, 63, __pyx_L3_error)
-    __pyx_v_site_indices = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5numpy_uint32_t(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_site_indices.memview)) __PYX_ERR(0, 63, __pyx_L3_error)
-    __pyx_v_spin_indices = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5numpy_uint32_t(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_spin_indices.memview)) __PYX_ERR(0, 63, __pyx_L3_error)
-    __pyx_v_coeff = __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_coeff.memview)) __PYX_ERR(0, 63, __pyx_L3_error)
-    __pyx_v_Ldwn = __Pyx_PyInt_As_npy_uint32(values[4]); if (unlikely((__pyx_v_Ldwn == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 63, __pyx_L3_error)
+    __pyx_v_basis = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_basis.memview)) __PYX_ERR(0, 62, __pyx_L3_error)
+    __pyx_v_site_indices = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5numpy_uint32_t(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_site_indices.memview)) __PYX_ERR(0, 62, __pyx_L3_error)
+    __pyx_v_spin_indices = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5numpy_uint32_t(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_spin_indices.memview)) __PYX_ERR(0, 62, __pyx_L3_error)
+    __pyx_v_coeff = __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_coeff.memview)) __PYX_ERR(0, 62, __pyx_L3_error)
+    __pyx_v_Ldwn = __Pyx_PyInt_As_npy_uint32(values[4]); if (unlikely((__pyx_v_Ldwn == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 62, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 63, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("linear", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 62, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.linear", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3522,7 +3536,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
   PyObject *__pyx_t_31 = NULL;
   __Pyx_RefNannySetupContext("linear", 0);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":74
+  /* "pyqhe/cython/hamiltonian_cy.pyx":73
  *     :return: sparse Hamiltonian
  *     """
  *     cdef Py_ssize_t Nstates = basis.shape[0]             # <<<<<<<<<<<<<<
@@ -3531,7 +3545,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
  */
   __pyx_v_Nstates = (__pyx_v_basis.shape[0]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":75
+  /* "pyqhe/cython/hamiltonian_cy.pyx":74
  *     """
  *     cdef Py_ssize_t Nstates = basis.shape[0]
  *     cdef Py_ssize_t L = basis.shape[1]             # <<<<<<<<<<<<<<
@@ -3540,7 +3554,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
  */
   __pyx_v_L = (__pyx_v_basis.shape[1]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":77
+  /* "pyqhe/cython/hamiltonian_cy.pyx":76
  *     cdef Py_ssize_t L = basis.shape[1]
  * 
  *     cdef Py_ssize_t Nsite_idx = site_indices.shape[0]             # <<<<<<<<<<<<<<
@@ -3549,7 +3563,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
  */
   __pyx_v_Nsite_idx = (__pyx_v_site_indices.shape[0]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":78
+  /* "pyqhe/cython/hamiltonian_cy.pyx":77
  * 
  *     cdef Py_ssize_t Nsite_idx = site_indices.shape[0]
  *     cdef Py_ssize_t Nspin_idx = spin_indices.shape[0]             # <<<<<<<<<<<<<<
@@ -3558,16 +3572,16 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
  */
   __pyx_v_Nspin_idx = (__pyx_v_spin_indices.shape[0]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":82
+  /* "pyqhe/cython/hamiltonian_cy.pyx":81
  *     cdef int i,j,k,f1,f2,idx,st0,st1,sp0,sp1
  * 
  *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))             # <<<<<<<<<<<<<<
  *     cdef dict cy_lut = lut
  * 
  */
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_basis, 2, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_basis, 2, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)(&PyTuple_Type)));
   __Pyx_GIVEREF(((PyObject *)(&PyTuple_Type)));
@@ -3575,18 +3589,18 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -3594,16 +3608,16 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyDict_Type)), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyDict_Type)), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_lut = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":83
+  /* "pyqhe/cython/hamiltonian_cy.pyx":82
  * 
  *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))
  *     cdef dict cy_lut = lut             # <<<<<<<<<<<<<<
@@ -3613,32 +3627,32 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
   __Pyx_INCREF(__pyx_v_lut);
   __pyx_v_cy_lut = __pyx_v_lut;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":85
+  /* "pyqhe/cython/hamiltonian_cy.pyx":84
  *     cdef dict cy_lut = lut
  * 
  *     state_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
  *     sp_np =  np.zeros(L, dtype=data_type)
  * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 85, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3646,32 +3660,32 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
   __pyx_v_state_np = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":86
+  /* "pyqhe/cython/hamiltonian_cy.pyx":85
  * 
  *     state_np =  np.zeros(L, dtype=data_type)
  *     sp_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
  * 
  *     cdef data_type_t [:] state = state_np
  */
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 86, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3679,31 +3693,31 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
   __pyx_v_sp_np = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":88
+  /* "pyqhe/cython/hamiltonian_cy.pyx":87
  *     sp_np =  np.zeros(L, dtype=data_type)
  * 
  *     cdef data_type_t [:] state = state_np             # <<<<<<<<<<<<<<
  *     cdef data_type_t [:] sp = sp_np
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_state_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_state_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 87, __pyx_L1_error)
   __pyx_v_state = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":89
+  /* "pyqhe/cython/hamiltonian_cy.pyx":88
  * 
  *     cdef data_type_t [:] state = state_np
  *     cdef data_type_t [:] sp = sp_np             # <<<<<<<<<<<<<<
  * 
  *     cdef vector[int] row, col
  */
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_sp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_sp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 88, __pyx_L1_error)
   __pyx_v_sp = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":94
+  /* "pyqhe/cython/hamiltonian_cy.pyx":93
  *     cdef vector[double] val
  *     #cdef double coeff = 1.0
  *     row.reserve(L**2)             # <<<<<<<<<<<<<<
@@ -3712,7 +3726,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
  */
   __pyx_v_row.reserve(__Pyx_pow_Py_ssize_t(__pyx_v_L, 2));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":95
+  /* "pyqhe/cython/hamiltonian_cy.pyx":94
  *     #cdef double coeff = 1.0
  *     row.reserve(L**2)
  *     col.reserve(L**2)             # <<<<<<<<<<<<<<
@@ -3721,7 +3735,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
  */
   __pyx_v_col.reserve(__Pyx_pow_Py_ssize_t(__pyx_v_L, 2));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":96
+  /* "pyqhe/cython/hamiltonian_cy.pyx":95
  *     row.reserve(L**2)
  *     col.reserve(L**2)
  *     val.reserve(L**2)             # <<<<<<<<<<<<<<
@@ -3730,7 +3744,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
  */
   __pyx_v_val.reserve(__Pyx_pow_Py_ssize_t(__pyx_v_L, 2));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":98
+  /* "pyqhe/cython/hamiltonian_cy.pyx":97
  *     val.reserve(L**2)
  * 
  *     for i in range(Nstates):             # <<<<<<<<<<<<<<
@@ -3742,7 +3756,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":99
+    /* "pyqhe/cython/hamiltonian_cy.pyx":98
  * 
  *     for i in range(Nstates):
  *         state[:] = basis[i,:]             # <<<<<<<<<<<<<<
@@ -3760,7 +3774,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_6linear(CYTHON_UNUSED 
         __pyx_tmp_idx += __pyx_tmp_shape;
     if (0 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
         PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
-        __PYX_ERR(0, 99, __pyx_L1_error)
+        __PYX_ERR(0, 98, __pyx_L1_error)
     }
         __pyx_t_5.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -3769,12 +3783,12 @@ __pyx_t_5.shape[0] = __pyx_v_basis.shape[1];
 __pyx_t_5.strides[0] = __pyx_v_basis.strides[1];
     __pyx_t_5.suboffsets[0] = -1;
 
-if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) < 0)) __PYX_ERR(0, 99, __pyx_L1_error)
+if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) < 0)) __PYX_ERR(0, 98, __pyx_L1_error)
     __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     __pyx_t_5.memview = NULL;
     __pyx_t_5.data = NULL;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":100
+    /* "pyqhe/cython/hamiltonian_cy.pyx":99
  *     for i in range(Nstates):
  *         state[:] = basis[i,:]
  *         for j in range(Nspin_idx):             # <<<<<<<<<<<<<<
@@ -3786,7 +3800,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_j = __pyx_t_11;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":101
+      /* "pyqhe/cython/hamiltonian_cy.pyx":100
  *         state[:] = basis[i,:]
  *         for j in range(Nspin_idx):
  *             for k in range(Nsite_idx):             # <<<<<<<<<<<<<<
@@ -3798,16 +3812,16 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
       for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
         __pyx_v_k = __pyx_t_14;
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":102
+        /* "pyqhe/cython/hamiltonian_cy.pyx":101
  *         for j in range(Nspin_idx):
  *             for k in range(Nsite_idx):
  *                 sp[:] = state             # <<<<<<<<<<<<<<
  *                 sp0 = spin_indices[j,0]
  *                 sp1 = spin_indices[j,1]
  */
-        if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_state, __pyx_v_sp, 1, 1, 0) < 0)) __PYX_ERR(0, 102, __pyx_L1_error)
+        if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_state, __pyx_v_sp, 1, 1, 0) < 0)) __PYX_ERR(0, 101, __pyx_L1_error)
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":103
+        /* "pyqhe/cython/hamiltonian_cy.pyx":102
  *             for k in range(Nsite_idx):
  *                 sp[:] = state
  *                 sp0 = spin_indices[j,0]             # <<<<<<<<<<<<<<
@@ -3818,7 +3832,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_16 = 0;
         __pyx_v_sp0 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_spin_indices.data + __pyx_t_15 * __pyx_v_spin_indices.strides[0]) ) + __pyx_t_16 * __pyx_v_spin_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":104
+        /* "pyqhe/cython/hamiltonian_cy.pyx":103
  *                 sp[:] = state
  *                 sp0 = spin_indices[j,0]
  *                 sp1 = spin_indices[j,1]             # <<<<<<<<<<<<<<
@@ -3829,7 +3843,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_18 = 1;
         __pyx_v_sp1 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_spin_indices.data + __pyx_t_17 * __pyx_v_spin_indices.strides[0]) ) + __pyx_t_18 * __pyx_v_spin_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":105
+        /* "pyqhe/cython/hamiltonian_cy.pyx":104
  *                 sp0 = spin_indices[j,0]
  *                 sp1 = spin_indices[j,1]
  *                 st0 = site_indices[k,0]             # <<<<<<<<<<<<<<
@@ -3840,7 +3854,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_20 = 0;
         __pyx_v_st0 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_site_indices.data + __pyx_t_19 * __pyx_v_site_indices.strides[0]) ) + __pyx_t_20 * __pyx_v_site_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":106
+        /* "pyqhe/cython/hamiltonian_cy.pyx":105
  *                 sp1 = spin_indices[j,1]
  *                 st0 = site_indices[k,0]
  *                 st1 = site_indices[k,1]             # <<<<<<<<<<<<<<
@@ -3851,7 +3865,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_22 = 1;
         __pyx_v_st1 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_site_indices.data + __pyx_t_21 * __pyx_v_site_indices.strides[0]) ) + __pyx_t_22 * __pyx_v_site_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":107
+        /* "pyqhe/cython/hamiltonian_cy.pyx":106
  *                 st0 = site_indices[k,0]
  *                 st1 = site_indices[k,1]
  *                 f1 = c_(sp, st1, sp1, Ldwn)             # <<<<<<<<<<<<<<
@@ -3860,7 +3874,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
         __pyx_v_f1 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_sp, __pyx_v_st1, __pyx_v_sp1, __pyx_v_Ldwn, 0);
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":108
+        /* "pyqhe/cython/hamiltonian_cy.pyx":107
  *                 st1 = site_indices[k,1]
  *                 f1 = c_(sp, st1, sp1, Ldwn)
  *                 f2 = c_dagger(sp, st0, sp0, Ldwn)             # <<<<<<<<<<<<<<
@@ -3869,7 +3883,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
         __pyx_v_f2 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_sp, __pyx_v_st0, __pyx_v_sp0, __pyx_v_Ldwn, 0);
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":109
+        /* "pyqhe/cython/hamiltonian_cy.pyx":108
  *                 f1 = c_(sp, st1, sp1, Ldwn)
  *                 f2 = c_dagger(sp, st0, sp0, Ldwn)
  *                 if f1!=0 and f2 !=0:             # <<<<<<<<<<<<<<
@@ -3887,26 +3901,26 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_L10_bool_binop_done:;
         if (__pyx_t_23) {
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":110
+          /* "pyqhe/cython/hamiltonian_cy.pyx":109
  *                 f2 = c_dagger(sp, st0, sp0, Ldwn)
  *                 if f1!=0 and f2 !=0:
  *                     idx = cy_lut[tuple(sp)]             # <<<<<<<<<<<<<<
  *                     row.push_back(i)
  *                     col.push_back(idx)
  */
-          __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_sp, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_sp, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 109, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_cy_lut, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_cy_lut, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_25 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_25 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_25 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_25 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 109, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_v_idx = __pyx_t_25;
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":111
+          /* "pyqhe/cython/hamiltonian_cy.pyx":110
  *                 if f1!=0 and f2 !=0:
  *                     idx = cy_lut[tuple(sp)]
  *                     row.push_back(i)             # <<<<<<<<<<<<<<
@@ -3917,10 +3931,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
             __pyx_v_row.push_back(__pyx_v_i);
           } catch(...) {
             __Pyx_CppExn2PyErr();
-            __PYX_ERR(0, 111, __pyx_L1_error)
+            __PYX_ERR(0, 110, __pyx_L1_error)
           }
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":112
+          /* "pyqhe/cython/hamiltonian_cy.pyx":111
  *                     idx = cy_lut[tuple(sp)]
  *                     row.push_back(i)
  *                     col.push_back(idx)             # <<<<<<<<<<<<<<
@@ -3931,10 +3945,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
             __pyx_v_col.push_back(__pyx_v_idx);
           } catch(...) {
             __Pyx_CppExn2PyErr();
-            __PYX_ERR(0, 112, __pyx_L1_error)
+            __PYX_ERR(0, 111, __pyx_L1_error)
           }
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":113
+          /* "pyqhe/cython/hamiltonian_cy.pyx":112
  *                     row.push_back(i)
  *                     col.push_back(idx)
  *                     val.push_back(coeff[st0,st1,sp0,sp1]*f1*f2)             # <<<<<<<<<<<<<<
@@ -3949,10 +3963,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
             __pyx_v_val.push_back((((*((__pyx_t_5numpy_float64_t *) ( /* dim=3 */ (( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_coeff.data + __pyx_t_26 * __pyx_v_coeff.strides[0]) ) + __pyx_t_27 * __pyx_v_coeff.strides[1]) ) + __pyx_t_28 * __pyx_v_coeff.strides[2]) ) + __pyx_t_29 * __pyx_v_coeff.strides[3]) ))) * __pyx_v_f1) * __pyx_v_f2));
           } catch(...) {
             __Pyx_CppExn2PyErr();
-            __PYX_ERR(0, 113, __pyx_L1_error)
+            __PYX_ERR(0, 112, __pyx_L1_error)
           }
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":109
+          /* "pyqhe/cython/hamiltonian_cy.pyx":108
  *                 f1 = c_(sp, st1, sp1, Ldwn)
  *                 f2 = c_dagger(sp, st0, sp0, Ldwn)
  *                 if f1!=0 and f2 !=0:             # <<<<<<<<<<<<<<
@@ -3964,7 +3978,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
     }
   }
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":115
+  /* "pyqhe/cython/hamiltonian_cy.pyx":114
  *                     val.push_back(coeff[st0,st1,sp0,sp1]*f1*f2)
  * 
  *     return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))             # <<<<<<<<<<<<<<
@@ -3972,15 +3986,15 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_coo_matrix); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_coo_matrix); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __pyx_convert_vector_to_py_double(__pyx_v_val); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_4 = __pyx_convert_vector_to_py_double(__pyx_v_val); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __pyx_convert_vector_to_py_int(__pyx_v_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert_vector_to_py_int(__pyx_v_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __pyx_convert_vector_to_py_int(__pyx_v_col); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert_vector_to_py_int(__pyx_v_col); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_30 = PyTuple_New(2); if (unlikely(!__pyx_t_30)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_30 = PyTuple_New(2); if (unlikely(!__pyx_t_30)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_30);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_30, 0, __pyx_t_2);
@@ -3988,7 +4002,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_30, 1, __pyx_t_1);
   __pyx_t_2 = 0;
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
@@ -3996,25 +4010,25 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_30);
   __pyx_t_4 = 0;
   __pyx_t_30 = 0;
-  __pyx_t_30 = PyTuple_New(1); if (unlikely(!__pyx_t_30)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_30 = PyTuple_New(1); if (unlikely(!__pyx_t_30)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_30);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_30, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 115, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_31 = PyTuple_New(2); if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_31 = PyTuple_New(2); if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_31);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_31, 0, __pyx_t_2);
@@ -4022,9 +4036,9 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_31, 1, __pyx_t_4);
   __pyx_t_2 = 0;
   __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_shape, __pyx_t_31) < 0) __PYX_ERR(0, 115, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_shape, __pyx_t_31) < 0) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_31); __pyx_t_31 = 0;
-  __pyx_t_31 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_30, __pyx_t_1); if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_31 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_30, __pyx_t_1); if (unlikely(!__pyx_t_31)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_31);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_30); __pyx_t_30 = 0;
@@ -4033,7 +4047,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   __pyx_t_31 = 0;
   goto __pyx_L0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":63
+  /* "pyqhe/cython/hamiltonian_cy.pyx":62
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def linear(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.uint32_t [:,:] spin_indices, np.float64_t [:,:,:,:] coeff, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
@@ -4068,7 +4082,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   return __pyx_r;
 }
 
-/* "pyqhe/cython/hamiltonian_cy.pyx":119
+/* "pyqhe/cython/hamiltonian_cy.pyx":118
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def quadratic(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.uint32_t [:,:] spin_indices,\             # <<<<<<<<<<<<<<
@@ -4121,35 +4135,35 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_9quadratic(PyObject *_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_site_indices)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 1); __PYX_ERR(0, 119, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 1); __PYX_ERR(0, 118, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_spin_indices)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 2); __PYX_ERR(0, 119, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 2); __PYX_ERR(0, 118, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_coeff_site)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 3); __PYX_ERR(0, 119, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 3); __PYX_ERR(0, 118, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_coeff_spin)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 4); __PYX_ERR(0, 119, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 4); __PYX_ERR(0, 118, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Ldwn)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 5); __PYX_ERR(0, 119, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, 5); __PYX_ERR(0, 118, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "quadratic") < 0)) __PYX_ERR(0, 119, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "quadratic") < 0)) __PYX_ERR(0, 118, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -4161,16 +4175,16 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_9quadratic(PyObject *_
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_basis = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_basis.memview)) __PYX_ERR(0, 119, __pyx_L3_error)
-    __pyx_v_site_indices = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5numpy_uint32_t(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_site_indices.memview)) __PYX_ERR(0, 119, __pyx_L3_error)
-    __pyx_v_spin_indices = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5numpy_uint32_t(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_spin_indices.memview)) __PYX_ERR(0, 119, __pyx_L3_error)
-    __pyx_v_coeff_site = __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_coeff_site.memview)) __PYX_ERR(0, 120, __pyx_L3_error)
-    __pyx_v_coeff_spin = __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_coeff_spin.memview)) __PYX_ERR(0, 120, __pyx_L3_error)
-    __pyx_v_Ldwn = __Pyx_PyInt_As_npy_uint32(values[5]); if (unlikely((__pyx_v_Ldwn == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L3_error)
+    __pyx_v_basis = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_basis.memview)) __PYX_ERR(0, 118, __pyx_L3_error)
+    __pyx_v_site_indices = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5numpy_uint32_t(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_site_indices.memview)) __PYX_ERR(0, 118, __pyx_L3_error)
+    __pyx_v_spin_indices = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5numpy_uint32_t(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_spin_indices.memview)) __PYX_ERR(0, 118, __pyx_L3_error)
+    __pyx_v_coeff_site = __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(values[3], PyBUF_WRITABLE); if (unlikely(!__pyx_v_coeff_site.memview)) __PYX_ERR(0, 119, __pyx_L3_error)
+    __pyx_v_coeff_spin = __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(values[4], PyBUF_WRITABLE); if (unlikely(!__pyx_v_coeff_spin.memview)) __PYX_ERR(0, 119, __pyx_L3_error)
+    __pyx_v_Ldwn = __Pyx_PyInt_As_npy_uint32(values[5]); if (unlikely((__pyx_v_Ldwn == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 119, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 119, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("quadratic", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 118, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.quadratic", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4260,7 +4274,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
   PyObject *__pyx_t_43 = NULL;
   __Pyx_RefNannySetupContext("quadratic", 0);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":133
+  /* "pyqhe/cython/hamiltonian_cy.pyx":132
  *     """
  * 
  *     cdef Py_ssize_t Nstates = basis.shape[0]             # <<<<<<<<<<<<<<
@@ -4269,7 +4283,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
  */
   __pyx_v_Nstates = (__pyx_v_basis.shape[0]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":134
+  /* "pyqhe/cython/hamiltonian_cy.pyx":133
  * 
  *     cdef Py_ssize_t Nstates = basis.shape[0]
  *     cdef Py_ssize_t L = basis.shape[1]             # <<<<<<<<<<<<<<
@@ -4278,7 +4292,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
  */
   __pyx_v_L = (__pyx_v_basis.shape[1]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":136
+  /* "pyqhe/cython/hamiltonian_cy.pyx":135
  *     cdef Py_ssize_t L = basis.shape[1]
  * 
  *     cdef Py_ssize_t Nsite_idx = site_indices.shape[0]             # <<<<<<<<<<<<<<
@@ -4287,7 +4301,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
  */
   __pyx_v_Nsite_idx = (__pyx_v_site_indices.shape[0]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":137
+  /* "pyqhe/cython/hamiltonian_cy.pyx":136
  * 
  *     cdef Py_ssize_t Nsite_idx = site_indices.shape[0]
  *     cdef Py_ssize_t Nspin_idx = spin_indices.shape[0]             # <<<<<<<<<<<<<<
@@ -4296,16 +4310,16 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
  */
   __pyx_v_Nspin_idx = (__pyx_v_spin_indices.shape[0]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":141
+  /* "pyqhe/cython/hamiltonian_cy.pyx":140
  *     cdef int i,j,k,f1,f2,f3,f4,idx,st0,st1,st2,st3,sp0,sp1,sp2,sp3
  * 
  *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))             # <<<<<<<<<<<<<<
  *     cdef dict cy_lut = lut
  * 
  */
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_basis, 2, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_basis, 2, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)(&PyTuple_Type)));
   __Pyx_GIVEREF(((PyObject *)(&PyTuple_Type)));
@@ -4313,18 +4327,18 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -4332,16 +4346,16 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyDict_Type)), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyDict_Type)), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_lut = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":142
+  /* "pyqhe/cython/hamiltonian_cy.pyx":141
  * 
  *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))
  *     cdef dict cy_lut = lut             # <<<<<<<<<<<<<<
@@ -4351,32 +4365,32 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
   __Pyx_INCREF(__pyx_v_lut);
   __pyx_v_cy_lut = __pyx_v_lut;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":144
+  /* "pyqhe/cython/hamiltonian_cy.pyx":143
  *     cdef dict cy_lut = lut
  * 
  *     state_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
  *     sp_np =  np.zeros(L, dtype=data_type)
  * 
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 144, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4384,32 +4398,32 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
   __pyx_v_state_np = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":145
+  /* "pyqhe/cython/hamiltonian_cy.pyx":144
  * 
  *     state_np =  np.zeros(L, dtype=data_type)
  *     sp_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
  * 
  *     cdef data_type_t [:] state = state_np
  */
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 145, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4417,31 +4431,31 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
   __pyx_v_sp_np = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":147
+  /* "pyqhe/cython/hamiltonian_cy.pyx":146
  *     sp_np =  np.zeros(L, dtype=data_type)
  * 
  *     cdef data_type_t [:] state = state_np             # <<<<<<<<<<<<<<
  *     cdef data_type_t [:] sp = sp_np
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_state_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_state_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 146, __pyx_L1_error)
   __pyx_v_state = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":148
+  /* "pyqhe/cython/hamiltonian_cy.pyx":147
  * 
  *     cdef data_type_t [:] state = state_np
  *     cdef data_type_t [:] sp = sp_np             # <<<<<<<<<<<<<<
  * 
  *     cdef vector[int] row, col
  */
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_sp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_sp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 147, __pyx_L1_error)
   __pyx_v_sp = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":153
+  /* "pyqhe/cython/hamiltonian_cy.pyx":152
  *     cdef vector[double] val
  * 
  *     row.reserve(L*Nstates)             # <<<<<<<<<<<<<<
@@ -4450,7 +4464,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
  */
   __pyx_v_row.reserve((__pyx_v_L * __pyx_v_Nstates));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":154
+  /* "pyqhe/cython/hamiltonian_cy.pyx":153
  * 
  *     row.reserve(L*Nstates)
  *     col.reserve(L*Nstates)             # <<<<<<<<<<<<<<
@@ -4459,7 +4473,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
  */
   __pyx_v_col.reserve((__pyx_v_L * __pyx_v_Nstates));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":155
+  /* "pyqhe/cython/hamiltonian_cy.pyx":154
  *     row.reserve(L*Nstates)
  *     col.reserve(L*Nstates)
  *     val.reserve(L*Nstates)             # <<<<<<<<<<<<<<
@@ -4468,7 +4482,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
  */
   __pyx_v_val.reserve((__pyx_v_L * __pyx_v_Nstates));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":157
+  /* "pyqhe/cython/hamiltonian_cy.pyx":156
  *     val.reserve(L*Nstates)
  * 
  *     for i in range(Nstates):             # <<<<<<<<<<<<<<
@@ -4480,7 +4494,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":158
+    /* "pyqhe/cython/hamiltonian_cy.pyx":157
  * 
  *     for i in range(Nstates):
  *         state[:] = basis[i,:]             # <<<<<<<<<<<<<<
@@ -4498,7 +4512,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_8quadratic(CYTHON_UNUS
         __pyx_tmp_idx += __pyx_tmp_shape;
     if (0 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
         PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
-        __PYX_ERR(0, 158, __pyx_L1_error)
+        __PYX_ERR(0, 157, __pyx_L1_error)
     }
         __pyx_t_5.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -4507,12 +4521,12 @@ __pyx_t_5.shape[0] = __pyx_v_basis.shape[1];
 __pyx_t_5.strides[0] = __pyx_v_basis.strides[1];
     __pyx_t_5.suboffsets[0] = -1;
 
-if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) < 0)) __PYX_ERR(0, 158, __pyx_L1_error)
+if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) < 0)) __PYX_ERR(0, 157, __pyx_L1_error)
     __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     __pyx_t_5.memview = NULL;
     __pyx_t_5.data = NULL;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":159
+    /* "pyqhe/cython/hamiltonian_cy.pyx":158
  *     for i in range(Nstates):
  *         state[:] = basis[i,:]
  *         for j in range(Nspin_idx):             # <<<<<<<<<<<<<<
@@ -4524,7 +4538,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_j = __pyx_t_11;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":160
+      /* "pyqhe/cython/hamiltonian_cy.pyx":159
  *         state[:] = basis[i,:]
  *         for j in range(Nspin_idx):
  *             for k in range(Nsite_idx):             # <<<<<<<<<<<<<<
@@ -4536,16 +4550,16 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
       for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
         __pyx_v_k = __pyx_t_14;
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":161
+        /* "pyqhe/cython/hamiltonian_cy.pyx":160
  *         for j in range(Nspin_idx):
  *             for k in range(Nsite_idx):
  *                 sp[:] = state             # <<<<<<<<<<<<<<
  *                 sp0 = spin_indices[j,0]
  *                 sp1 = spin_indices[j,1]
  */
-        if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_state, __pyx_v_sp, 1, 1, 0) < 0)) __PYX_ERR(0, 161, __pyx_L1_error)
+        if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_state, __pyx_v_sp, 1, 1, 0) < 0)) __PYX_ERR(0, 160, __pyx_L1_error)
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":162
+        /* "pyqhe/cython/hamiltonian_cy.pyx":161
  *             for k in range(Nsite_idx):
  *                 sp[:] = state
  *                 sp0 = spin_indices[j,0]             # <<<<<<<<<<<<<<
@@ -4556,7 +4570,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_16 = 0;
         __pyx_v_sp0 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_spin_indices.data + __pyx_t_15 * __pyx_v_spin_indices.strides[0]) ) + __pyx_t_16 * __pyx_v_spin_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":163
+        /* "pyqhe/cython/hamiltonian_cy.pyx":162
  *                 sp[:] = state
  *                 sp0 = spin_indices[j,0]
  *                 sp1 = spin_indices[j,1]             # <<<<<<<<<<<<<<
@@ -4567,7 +4581,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_18 = 1;
         __pyx_v_sp1 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_spin_indices.data + __pyx_t_17 * __pyx_v_spin_indices.strides[0]) ) + __pyx_t_18 * __pyx_v_spin_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":164
+        /* "pyqhe/cython/hamiltonian_cy.pyx":163
  *                 sp0 = spin_indices[j,0]
  *                 sp1 = spin_indices[j,1]
  *                 sp2 = spin_indices[j,2]             # <<<<<<<<<<<<<<
@@ -4578,7 +4592,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_20 = 2;
         __pyx_v_sp2 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_spin_indices.data + __pyx_t_19 * __pyx_v_spin_indices.strides[0]) ) + __pyx_t_20 * __pyx_v_spin_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":165
+        /* "pyqhe/cython/hamiltonian_cy.pyx":164
  *                 sp1 = spin_indices[j,1]
  *                 sp2 = spin_indices[j,2]
  *                 sp3 = spin_indices[j,3]             # <<<<<<<<<<<<<<
@@ -4589,7 +4603,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_22 = 3;
         __pyx_v_sp3 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_spin_indices.data + __pyx_t_21 * __pyx_v_spin_indices.strides[0]) ) + __pyx_t_22 * __pyx_v_spin_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":166
+        /* "pyqhe/cython/hamiltonian_cy.pyx":165
  *                 sp2 = spin_indices[j,2]
  *                 sp3 = spin_indices[j,3]
  *                 st0 = site_indices[k,0]             # <<<<<<<<<<<<<<
@@ -4600,7 +4614,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_24 = 0;
         __pyx_v_st0 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_site_indices.data + __pyx_t_23 * __pyx_v_site_indices.strides[0]) ) + __pyx_t_24 * __pyx_v_site_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":167
+        /* "pyqhe/cython/hamiltonian_cy.pyx":166
  *                 sp3 = spin_indices[j,3]
  *                 st0 = site_indices[k,0]
  *                 st1 = site_indices[k,1]             # <<<<<<<<<<<<<<
@@ -4611,7 +4625,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_26 = 1;
         __pyx_v_st1 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_site_indices.data + __pyx_t_25 * __pyx_v_site_indices.strides[0]) ) + __pyx_t_26 * __pyx_v_site_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":168
+        /* "pyqhe/cython/hamiltonian_cy.pyx":167
  *                 st0 = site_indices[k,0]
  *                 st1 = site_indices[k,1]
  *                 st2 = site_indices[k,2]             # <<<<<<<<<<<<<<
@@ -4622,7 +4636,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_28 = 2;
         __pyx_v_st2 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_site_indices.data + __pyx_t_27 * __pyx_v_site_indices.strides[0]) ) + __pyx_t_28 * __pyx_v_site_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":169
+        /* "pyqhe/cython/hamiltonian_cy.pyx":168
  *                 st1 = site_indices[k,1]
  *                 st2 = site_indices[k,2]
  *                 st3 = site_indices[k,3]             # <<<<<<<<<<<<<<
@@ -4633,7 +4647,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_30 = 3;
         __pyx_v_st3 = (*((__pyx_t_5numpy_uint32_t *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_site_indices.data + __pyx_t_29 * __pyx_v_site_indices.strides[0]) ) + __pyx_t_30 * __pyx_v_site_indices.strides[1]) )));
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":170
+        /* "pyqhe/cython/hamiltonian_cy.pyx":169
  *                 st2 = site_indices[k,2]
  *                 st3 = site_indices[k,3]
  *                 f1 = c_(sp, st3, sp3, Ldwn)             # <<<<<<<<<<<<<<
@@ -4642,7 +4656,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
         __pyx_v_f1 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_sp, __pyx_v_st3, __pyx_v_sp3, __pyx_v_Ldwn, 0);
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":171
+        /* "pyqhe/cython/hamiltonian_cy.pyx":170
  *                 st3 = site_indices[k,3]
  *                 f1 = c_(sp, st3, sp3, Ldwn)
  *                 f2 = c_(sp, st2, sp2, Ldwn)             # <<<<<<<<<<<<<<
@@ -4651,7 +4665,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
         __pyx_v_f2 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_sp, __pyx_v_st2, __pyx_v_sp2, __pyx_v_Ldwn, 0);
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":172
+        /* "pyqhe/cython/hamiltonian_cy.pyx":171
  *                 f1 = c_(sp, st3, sp3, Ldwn)
  *                 f2 = c_(sp, st2, sp2, Ldwn)
  *                 if f1!=0 and f2 !=0:             # <<<<<<<<<<<<<<
@@ -4669,7 +4683,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_L10_bool_binop_done:;
         if (__pyx_t_31) {
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":173
+          /* "pyqhe/cython/hamiltonian_cy.pyx":172
  *                 f2 = c_(sp, st2, sp2, Ldwn)
  *                 if f1!=0 and f2 !=0:
  *                     f3 = c_dagger(sp, st1, sp1, Ldwn)             # <<<<<<<<<<<<<<
@@ -4678,7 +4692,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
           __pyx_v_f3 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_sp, __pyx_v_st1, __pyx_v_sp1, __pyx_v_Ldwn, 0);
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":174
+          /* "pyqhe/cython/hamiltonian_cy.pyx":173
  *                 if f1!=0 and f2 !=0:
  *                     f3 = c_dagger(sp, st1, sp1, Ldwn)
  *                     f4 = c_dagger(sp, st0, sp0, Ldwn)             # <<<<<<<<<<<<<<
@@ -4687,7 +4701,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
           __pyx_v_f4 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_sp, __pyx_v_st0, __pyx_v_sp0, __pyx_v_Ldwn, 0);
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":175
+          /* "pyqhe/cython/hamiltonian_cy.pyx":174
  *                     f3 = c_dagger(sp, st1, sp1, Ldwn)
  *                     f4 = c_dagger(sp, st0, sp0, Ldwn)
  *                     if f3!=0 and f4 !=0:             # <<<<<<<<<<<<<<
@@ -4705,26 +4719,26 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
           __pyx_L13_bool_binop_done:;
           if (__pyx_t_31) {
 
-            /* "pyqhe/cython/hamiltonian_cy.pyx":176
+            /* "pyqhe/cython/hamiltonian_cy.pyx":175
  *                     f4 = c_dagger(sp, st0, sp0, Ldwn)
  *                     if f3!=0 and f4 !=0:
  *                         idx = cy_lut[tuple(sp)]             # <<<<<<<<<<<<<<
  *                         row.push_back(i)
  *                         col.push_back(idx)
  */
-            __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_sp, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L1_error)
+            __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_sp, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
-            __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 176, __pyx_L1_error)
+            __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 175, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-            __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_cy_lut, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L1_error)
+            __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_cy_lut, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-            __pyx_t_33 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_33 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 176, __pyx_L1_error)
+            __pyx_t_33 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_33 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 175, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_idx = __pyx_t_33;
 
-            /* "pyqhe/cython/hamiltonian_cy.pyx":177
+            /* "pyqhe/cython/hamiltonian_cy.pyx":176
  *                     if f3!=0 and f4 !=0:
  *                         idx = cy_lut[tuple(sp)]
  *                         row.push_back(i)             # <<<<<<<<<<<<<<
@@ -4735,10 +4749,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
               __pyx_v_row.push_back(__pyx_v_i);
             } catch(...) {
               __Pyx_CppExn2PyErr();
-              __PYX_ERR(0, 177, __pyx_L1_error)
+              __PYX_ERR(0, 176, __pyx_L1_error)
             }
 
-            /* "pyqhe/cython/hamiltonian_cy.pyx":178
+            /* "pyqhe/cython/hamiltonian_cy.pyx":177
  *                         idx = cy_lut[tuple(sp)]
  *                         row.push_back(i)
  *                         col.push_back(idx)             # <<<<<<<<<<<<<<
@@ -4749,10 +4763,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
               __pyx_v_col.push_back(__pyx_v_idx);
             } catch(...) {
               __Pyx_CppExn2PyErr();
-              __PYX_ERR(0, 178, __pyx_L1_error)
+              __PYX_ERR(0, 177, __pyx_L1_error)
             }
 
-            /* "pyqhe/cython/hamiltonian_cy.pyx":179
+            /* "pyqhe/cython/hamiltonian_cy.pyx":178
  *                         row.push_back(i)
  *                         col.push_back(idx)
  *                         val.push_back(coeff_site[st0,st1,st2,st3]*coeff_spin[sp0,sp1,sp2,sp3]*f1*f2*f3*f4)             # <<<<<<<<<<<<<<
@@ -4771,10 +4785,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
               __pyx_v_val.push_back(((((((*((__pyx_t_5numpy_float64_t *) ( /* dim=3 */ (( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_coeff_site.data + __pyx_t_34 * __pyx_v_coeff_site.strides[0]) ) + __pyx_t_35 * __pyx_v_coeff_site.strides[1]) ) + __pyx_t_36 * __pyx_v_coeff_site.strides[2]) ) + __pyx_t_37 * __pyx_v_coeff_site.strides[3]) ))) * (*((__pyx_t_5numpy_float64_t *) ( /* dim=3 */ (( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_coeff_spin.data + __pyx_t_38 * __pyx_v_coeff_spin.strides[0]) ) + __pyx_t_39 * __pyx_v_coeff_spin.strides[1]) ) + __pyx_t_40 * __pyx_v_coeff_spin.strides[2]) ) + __pyx_t_41 * __pyx_v_coeff_spin.strides[3]) )))) * __pyx_v_f1) * __pyx_v_f2) * __pyx_v_f3) * __pyx_v_f4));
             } catch(...) {
               __Pyx_CppExn2PyErr();
-              __PYX_ERR(0, 179, __pyx_L1_error)
+              __PYX_ERR(0, 178, __pyx_L1_error)
             }
 
-            /* "pyqhe/cython/hamiltonian_cy.pyx":175
+            /* "pyqhe/cython/hamiltonian_cy.pyx":174
  *                     f3 = c_dagger(sp, st1, sp1, Ldwn)
  *                     f4 = c_dagger(sp, st0, sp0, Ldwn)
  *                     if f3!=0 and f4 !=0:             # <<<<<<<<<<<<<<
@@ -4783,7 +4797,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
           }
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":172
+          /* "pyqhe/cython/hamiltonian_cy.pyx":171
  *                 f1 = c_(sp, st3, sp3, Ldwn)
  *                 f2 = c_(sp, st2, sp2, Ldwn)
  *                 if f1!=0 and f2 !=0:             # <<<<<<<<<<<<<<
@@ -4795,7 +4809,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
     }
   }
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":181
+  /* "pyqhe/cython/hamiltonian_cy.pyx":180
  *                         val.push_back(coeff_site[st0,st1,st2,st3]*coeff_spin[sp0,sp1,sp2,sp3]*f1*f2*f3*f4)
  * 
  *     return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))             # <<<<<<<<<<<<<<
@@ -4803,15 +4817,15 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_coo_matrix); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_coo_matrix); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __pyx_convert_vector_to_py_double(__pyx_v_val); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_4 = __pyx_convert_vector_to_py_double(__pyx_v_val); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __pyx_convert_vector_to_py_int(__pyx_v_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert_vector_to_py_int(__pyx_v_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __pyx_convert_vector_to_py_int(__pyx_v_col); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert_vector_to_py_int(__pyx_v_col); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_42 = PyTuple_New(2); if (unlikely(!__pyx_t_42)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_42 = PyTuple_New(2); if (unlikely(!__pyx_t_42)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_42);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_42, 0, __pyx_t_2);
@@ -4819,7 +4833,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_42, 1, __pyx_t_1);
   __pyx_t_2 = 0;
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
@@ -4827,25 +4841,25 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_42);
   __pyx_t_4 = 0;
   __pyx_t_42 = 0;
-  __pyx_t_42 = PyTuple_New(1); if (unlikely(!__pyx_t_42)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_42 = PyTuple_New(1); if (unlikely(!__pyx_t_42)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_42);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_42, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 181, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_43 = PyTuple_New(2); if (unlikely(!__pyx_t_43)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_43 = PyTuple_New(2); if (unlikely(!__pyx_t_43)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_43);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_43, 0, __pyx_t_2);
@@ -4853,9 +4867,9 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_43, 1, __pyx_t_4);
   __pyx_t_2 = 0;
   __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_shape, __pyx_t_43) < 0) __PYX_ERR(0, 181, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_shape, __pyx_t_43) < 0) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_43); __pyx_t_43 = 0;
-  __pyx_t_43 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_42, __pyx_t_1); if (unlikely(!__pyx_t_43)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_43 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_42, __pyx_t_1); if (unlikely(!__pyx_t_43)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_43);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_42); __pyx_t_42 = 0;
@@ -4864,7 +4878,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   __pyx_t_43 = 0;
   goto __pyx_L0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":119
+  /* "pyqhe/cython/hamiltonian_cy.pyx":118
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def quadratic(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.uint32_t [:,:] spin_indices,\             # <<<<<<<<<<<<<<
@@ -4900,7 +4914,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   return __pyx_r;
 }
 
-/* "pyqhe/cython/hamiltonian_cy.pyx":185
+/* "pyqhe/cython/hamiltonian_cy.pyx":184
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def quadratic_delta(data_type_t [:,:] basis, np.float64_t [:,:,:,:] coeff, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
@@ -4944,17 +4958,17 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_11quadratic_delta(PyOb
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_coeff)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("quadratic_delta", 1, 3, 3, 1); __PYX_ERR(0, 185, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("quadratic_delta", 1, 3, 3, 1); __PYX_ERR(0, 184, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Ldwn)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("quadratic_delta", 1, 3, 3, 2); __PYX_ERR(0, 185, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("quadratic_delta", 1, 3, 3, 2); __PYX_ERR(0, 184, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "quadratic_delta") < 0)) __PYX_ERR(0, 185, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "quadratic_delta") < 0)) __PYX_ERR(0, 184, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -4963,13 +4977,13 @@ static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_11quadratic_delta(PyOb
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_basis = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_basis.memview)) __PYX_ERR(0, 185, __pyx_L3_error)
-    __pyx_v_coeff = __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_coeff.memview)) __PYX_ERR(0, 185, __pyx_L3_error)
-    __pyx_v_Ldwn = __Pyx_PyInt_As_npy_uint32(values[2]); if (unlikely((__pyx_v_Ldwn == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
+    __pyx_v_basis = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_basis.memview)) __PYX_ERR(0, 184, __pyx_L3_error)
+    __pyx_v_coeff = __Pyx_PyObject_to_MemoryviewSlice_dsdsdsds_nn___pyx_t_5numpy_float64_t(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_coeff.memview)) __PYX_ERR(0, 184, __pyx_L3_error)
+    __pyx_v_Ldwn = __Pyx_PyInt_As_npy_uint32(values[2]); if (unlikely((__pyx_v_Ldwn == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 184, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("quadratic_delta", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 185, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("quadratic_delta", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 184, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.quadratic_delta", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5040,7 +5054,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
   PyObject *__pyx_t_28 = NULL;
   __Pyx_RefNannySetupContext("quadratic_delta", 0);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":194
+  /* "pyqhe/cython/hamiltonian_cy.pyx":193
  *     :return:
  *     """
  *     cdef Py_ssize_t Nstates = basis.shape[0]             # <<<<<<<<<<<<<<
@@ -5049,7 +5063,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
  */
   __pyx_v_Nstates = (__pyx_v_basis.shape[0]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":195
+  /* "pyqhe/cython/hamiltonian_cy.pyx":194
  *     """
  *     cdef Py_ssize_t Nstates = basis.shape[0]
  *     cdef Py_ssize_t L = basis.shape[1]             # <<<<<<<<<<<<<<
@@ -5058,16 +5072,16 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
  */
   __pyx_v_L = (__pyx_v_basis.shape[1]);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":198
+  /* "pyqhe/cython/hamiltonian_cy.pyx":197
  *     cdef int i,j,k,l,m,f1,f2,f3,f4,idx
  * 
  *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))             # <<<<<<<<<<<<<<
  *     cdef dict cy_lut = lut
  * 
  */
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_basis, 2, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_basis, 2, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)(&PyTuple_Type)));
   __Pyx_GIVEREF(((PyObject *)(&PyTuple_Type)));
@@ -5075,18 +5089,18 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -5094,16 +5108,16 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyDict_Type)), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyDict_Type)), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_lut = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":199
+  /* "pyqhe/cython/hamiltonian_cy.pyx":198
  * 
  *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))
  *     cdef dict cy_lut = lut             # <<<<<<<<<<<<<<
@@ -5113,32 +5127,32 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
   __Pyx_INCREF(__pyx_v_lut);
   __pyx_v_cy_lut = __pyx_v_lut;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":201
+  /* "pyqhe/cython/hamiltonian_cy.pyx":200
  *     cdef dict cy_lut = lut
  * 
  *     state_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
  *     sp_np =  np.zeros(L, dtype=data_type)
  *     spp_np =  np.zeros(L, dtype=data_type)
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 201, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5146,32 +5160,32 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
   __pyx_v_state_np = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":202
+  /* "pyqhe/cython/hamiltonian_cy.pyx":201
  * 
  *     state_np =  np.zeros(L, dtype=data_type)
  *     sp_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
  *     spp_np =  np.zeros(L, dtype=data_type)
  *     cdef data_type_t [:] state = state_np
  */
-  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 202, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5179,32 +5193,32 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
   __pyx_v_sp_np = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":203
+  /* "pyqhe/cython/hamiltonian_cy.pyx":202
  *     state_np =  np.zeros(L, dtype=data_type)
  *     sp_np =  np.zeros(L, dtype=data_type)
  *     spp_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
  *     cdef data_type_t [:] state = state_np
  *     cdef data_type_t [:] sp = sp_np
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 203, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5212,43 +5226,43 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
   __pyx_v_spp_np = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":204
+  /* "pyqhe/cython/hamiltonian_cy.pyx":203
  *     sp_np =  np.zeros(L, dtype=data_type)
  *     spp_np =  np.zeros(L, dtype=data_type)
  *     cdef data_type_t [:] state = state_np             # <<<<<<<<<<<<<<
  *     cdef data_type_t [:] sp = sp_np
  *     cdef data_type_t [:] spp = spp_np
  */
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_state_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_state_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 203, __pyx_L1_error)
   __pyx_v_state = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":205
+  /* "pyqhe/cython/hamiltonian_cy.pyx":204
  *     spp_np =  np.zeros(L, dtype=data_type)
  *     cdef data_type_t [:] state = state_np
  *     cdef data_type_t [:] sp = sp_np             # <<<<<<<<<<<<<<
  *     cdef data_type_t [:] spp = spp_np
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_sp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_sp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 204, __pyx_L1_error)
   __pyx_v_sp = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":206
+  /* "pyqhe/cython/hamiltonian_cy.pyx":205
  *     cdef data_type_t [:] state = state_np
  *     cdef data_type_t [:] sp = sp_np
  *     cdef data_type_t [:] spp = spp_np             # <<<<<<<<<<<<<<
  * 
  *     cdef vector[int] row, col
  */
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_spp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_spp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 205, __pyx_L1_error)
   __pyx_v_spp = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":211
+  /* "pyqhe/cython/hamiltonian_cy.pyx":210
  *     cdef vector[double] val
  * 
  *     row.reserve(L*Nstates)             # <<<<<<<<<<<<<<
@@ -5257,7 +5271,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
  */
   __pyx_v_row.reserve((__pyx_v_L * __pyx_v_Nstates));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":212
+  /* "pyqhe/cython/hamiltonian_cy.pyx":211
  * 
  *     row.reserve(L*Nstates)
  *     col.reserve(L*Nstates)             # <<<<<<<<<<<<<<
@@ -5266,7 +5280,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
  */
   __pyx_v_col.reserve((__pyx_v_L * __pyx_v_Nstates));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":213
+  /* "pyqhe/cython/hamiltonian_cy.pyx":212
  *     row.reserve(L*Nstates)
  *     col.reserve(L*Nstates)
  *     val.reserve(L*Nstates)             # <<<<<<<<<<<<<<
@@ -5275,7 +5289,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
  */
   __pyx_v_val.reserve((__pyx_v_L * __pyx_v_Nstates));
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":215
+  /* "pyqhe/cython/hamiltonian_cy.pyx":214
  *     val.reserve(L*Nstates)
  * 
  *     for i in range(Nstates):             # <<<<<<<<<<<<<<
@@ -5287,7 +5301,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":216
+    /* "pyqhe/cython/hamiltonian_cy.pyx":215
  * 
  *     for i in range(Nstates):
  *         state[:] = basis[i,:]             # <<<<<<<<<<<<<<
@@ -5305,7 +5319,7 @@ static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_10quadratic_delta(CYTH
         __pyx_tmp_idx += __pyx_tmp_shape;
     if (0 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
         PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
-        __PYX_ERR(0, 216, __pyx_L1_error)
+        __PYX_ERR(0, 215, __pyx_L1_error)
     }
         __pyx_t_5.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -5314,12 +5328,12 @@ __pyx_t_5.shape[0] = __pyx_v_basis.shape[1];
 __pyx_t_5.strides[0] = __pyx_v_basis.strides[1];
     __pyx_t_5.suboffsets[0] = -1;
 
-if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) < 0)) __PYX_ERR(0, 216, __pyx_L1_error)
+if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) < 0)) __PYX_ERR(0, 215, __pyx_L1_error)
     __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
     __pyx_t_5.memview = NULL;
     __pyx_t_5.data = NULL;
 
-    /* "pyqhe/cython/hamiltonian_cy.pyx":217
+    /* "pyqhe/cython/hamiltonian_cy.pyx":216
  *     for i in range(Nstates):
  *         state[:] = basis[i,:]
  *         for sig1 in range(2):             # <<<<<<<<<<<<<<
@@ -5329,7 +5343,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
     for (__pyx_t_9 = 0; __pyx_t_9 < 2; __pyx_t_9+=1) {
       __pyx_v_sig1 = __pyx_t_9;
 
-      /* "pyqhe/cython/hamiltonian_cy.pyx":218
+      /* "pyqhe/cython/hamiltonian_cy.pyx":217
  *         state[:] = basis[i,:]
  *         for sig1 in range(2):
  *             for sig2 in range(2):             # <<<<<<<<<<<<<<
@@ -5339,7 +5353,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
       for (__pyx_t_10 = 0; __pyx_t_10 < 2; __pyx_t_10+=1) {
         __pyx_v_sig2 = __pyx_t_10;
 
-        /* "pyqhe/cython/hamiltonian_cy.pyx":219
+        /* "pyqhe/cython/hamiltonian_cy.pyx":218
  *         for sig1 in range(2):
  *             for sig2 in range(2):
  *                 if sig1!=sig2:             # <<<<<<<<<<<<<<
@@ -5349,7 +5363,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
         __pyx_t_11 = ((__pyx_v_sig1 != __pyx_v_sig2) != 0);
         if (__pyx_t_11) {
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":220
+          /* "pyqhe/cython/hamiltonian_cy.pyx":219
  *             for sig2 in range(2):
  *                 if sig1!=sig2:
  *                     for j in range(Ldwn):             # <<<<<<<<<<<<<<
@@ -5361,7 +5375,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
           for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
             __pyx_v_j = __pyx_t_14;
 
-            /* "pyqhe/cython/hamiltonian_cy.pyx":221
+            /* "pyqhe/cython/hamiltonian_cy.pyx":220
  *                 if sig1!=sig2:
  *                     for j in range(Ldwn):
  *                         for k in range(Ldwn):             # <<<<<<<<<<<<<<
@@ -5373,16 +5387,16 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
             for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
               __pyx_v_k = __pyx_t_17;
 
-              /* "pyqhe/cython/hamiltonian_cy.pyx":222
+              /* "pyqhe/cython/hamiltonian_cy.pyx":221
  *                     for j in range(Ldwn):
  *                         for k in range(Ldwn):
  *                             sp[:] = state             # <<<<<<<<<<<<<<
  *                             #print('sp b',j,k, tuple(sp))
  *                             #check if two states j and k are occupied
  */
-              if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_state, __pyx_v_sp, 1, 1, 0) < 0)) __PYX_ERR(0, 222, __pyx_L1_error)
+              if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_state, __pyx_v_sp, 1, 1, 0) < 0)) __PYX_ERR(0, 221, __pyx_L1_error)
 
-              /* "pyqhe/cython/hamiltonian_cy.pyx":225
+              /* "pyqhe/cython/hamiltonian_cy.pyx":224
  *                             #print('sp b',j,k, tuple(sp))
  *                             #check if two states j and k are occupied
  *                             f1 = c_(sp, j, sig1, Ldwn)             # <<<<<<<<<<<<<<
@@ -5391,7 +5405,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
               __pyx_v_f1 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_sp, __pyx_v_j, __pyx_v_sig1, __pyx_v_Ldwn, 0);
 
-              /* "pyqhe/cython/hamiltonian_cy.pyx":226
+              /* "pyqhe/cython/hamiltonian_cy.pyx":225
  *                             #check if two states j and k are occupied
  *                             f1 = c_(sp, j, sig1, Ldwn)
  *                             f2 = c_(sp, k, sig2, Ldwn)             # <<<<<<<<<<<<<<
@@ -5400,7 +5414,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
               __pyx_v_f2 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_sp, __pyx_v_k, __pyx_v_sig2, __pyx_v_Ldwn, 0);
 
-              /* "pyqhe/cython/hamiltonian_cy.pyx":227
+              /* "pyqhe/cython/hamiltonian_cy.pyx":226
  *                             f1 = c_(sp, j, sig1, Ldwn)
  *                             f2 = c_(sp, k, sig2, Ldwn)
  *                             if f1!=0 and f2 !=0:             # <<<<<<<<<<<<<<
@@ -5418,7 +5432,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
               __pyx_L15_bool_binop_done:;
               if (__pyx_t_11) {
 
-                /* "pyqhe/cython/hamiltonian_cy.pyx":229
+                /* "pyqhe/cython/hamiltonian_cy.pyx":228
  *                             if f1!=0 and f2 !=0:
  *                                 #print('sp', j,k, tuple(sp))
  *                                 for l in range(Ldwn):             # <<<<<<<<<<<<<<
@@ -5430,16 +5444,16 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
                 for (__pyx_t_21 = 0; __pyx_t_21 < __pyx_t_20; __pyx_t_21+=1) {
                   __pyx_v_l = __pyx_t_21;
 
-                  /* "pyqhe/cython/hamiltonian_cy.pyx":230
+                  /* "pyqhe/cython/hamiltonian_cy.pyx":229
  *                                 #print('sp', j,k, tuple(sp))
  *                                 for l in range(Ldwn):
  *                                     spp[:] = sp             # <<<<<<<<<<<<<<
  *                                     m = j+k-l
  *                                     if m>=0 and m<Ldwn:
  */
-                  if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_sp, __pyx_v_spp, 1, 1, 0) < 0)) __PYX_ERR(0, 230, __pyx_L1_error)
+                  if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_sp, __pyx_v_spp, 1, 1, 0) < 0)) __PYX_ERR(0, 229, __pyx_L1_error)
 
-                  /* "pyqhe/cython/hamiltonian_cy.pyx":231
+                  /* "pyqhe/cython/hamiltonian_cy.pyx":230
  *                                 for l in range(Ldwn):
  *                                     spp[:] = sp
  *                                     m = j+k-l             # <<<<<<<<<<<<<<
@@ -5448,7 +5462,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
                   __pyx_v_m = ((__pyx_v_j + __pyx_v_k) - __pyx_v_l);
 
-                  /* "pyqhe/cython/hamiltonian_cy.pyx":232
+                  /* "pyqhe/cython/hamiltonian_cy.pyx":231
  *                                     spp[:] = sp
  *                                     m = j+k-l
  *                                     if m>=0 and m<Ldwn:             # <<<<<<<<<<<<<<
@@ -5466,7 +5480,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
                   __pyx_L20_bool_binop_done:;
                   if (__pyx_t_11) {
 
-                    /* "pyqhe/cython/hamiltonian_cy.pyx":234
+                    /* "pyqhe/cython/hamiltonian_cy.pyx":233
  *                                     if m>=0 and m<Ldwn:
  *                                         #print('spp b', l ,m, tuple(spp))
  *                                         f3 = c_dagger(spp, l, sig2, Ldwn)             # <<<<<<<<<<<<<<
@@ -5475,7 +5489,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
                     __pyx_v_f3 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_spp, __pyx_v_l, __pyx_v_sig2, __pyx_v_Ldwn, 0);
 
-                    /* "pyqhe/cython/hamiltonian_cy.pyx":235
+                    /* "pyqhe/cython/hamiltonian_cy.pyx":234
  *                                         #print('spp b', l ,m, tuple(spp))
  *                                         f3 = c_dagger(spp, l, sig2, Ldwn)
  *                                         f4 = c_dagger(spp, m, sig1, Ldwn)             # <<<<<<<<<<<<<<
@@ -5484,7 +5498,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
                     __pyx_v_f4 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_spp, __pyx_v_m, __pyx_v_sig1, __pyx_v_Ldwn, 0);
 
-                    /* "pyqhe/cython/hamiltonian_cy.pyx":237
+                    /* "pyqhe/cython/hamiltonian_cy.pyx":236
  *                                         f4 = c_dagger(spp, m, sig1, Ldwn)
  * 
  *                                         if f3!=0 and f4 !=0:             # <<<<<<<<<<<<<<
@@ -5502,26 +5516,26 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
                     __pyx_L23_bool_binop_done:;
                     if (__pyx_t_11) {
 
-                      /* "pyqhe/cython/hamiltonian_cy.pyx":239
+                      /* "pyqhe/cython/hamiltonian_cy.pyx":238
  *                                         if f3!=0 and f4 !=0:
  *                                             #print('spp', l ,m, tuple(spp))
  *                                             idx = cy_lut[tuple(spp)]             # <<<<<<<<<<<<<<
  *                                             #print(i, idx)
  *                                             row.push_back(i)
  */
-                      __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_spp, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+                      __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_spp, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
                       __Pyx_GOTREF(__pyx_t_1);
-                      __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
+                      __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 238, __pyx_L1_error)
                       __Pyx_GOTREF(__pyx_t_3);
                       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                      __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_cy_lut, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+                      __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_cy_lut, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
                       __Pyx_GOTREF(__pyx_t_1);
                       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-                      __pyx_t_22 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_22 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 239, __pyx_L1_error)
+                      __pyx_t_22 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_22 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L1_error)
                       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
                       __pyx_v_idx = __pyx_t_22;
 
-                      /* "pyqhe/cython/hamiltonian_cy.pyx":241
+                      /* "pyqhe/cython/hamiltonian_cy.pyx":240
  *                                             idx = cy_lut[tuple(spp)]
  *                                             #print(i, idx)
  *                                             row.push_back(i)             # <<<<<<<<<<<<<<
@@ -5532,10 +5546,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
                         __pyx_v_row.push_back(__pyx_v_i);
                       } catch(...) {
                         __Pyx_CppExn2PyErr();
-                        __PYX_ERR(0, 241, __pyx_L1_error)
+                        __PYX_ERR(0, 240, __pyx_L1_error)
                       }
 
-                      /* "pyqhe/cython/hamiltonian_cy.pyx":242
+                      /* "pyqhe/cython/hamiltonian_cy.pyx":241
  *                                             #print(i, idx)
  *                                             row.push_back(i)
  *                                             col.push_back(idx)             # <<<<<<<<<<<<<<
@@ -5546,10 +5560,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
                         __pyx_v_col.push_back(__pyx_v_idx);
                       } catch(...) {
                         __Pyx_CppExn2PyErr();
-                        __PYX_ERR(0, 242, __pyx_L1_error)
+                        __PYX_ERR(0, 241, __pyx_L1_error)
                       }
 
-                      /* "pyqhe/cython/hamiltonian_cy.pyx":243
+                      /* "pyqhe/cython/hamiltonian_cy.pyx":242
  *                                             row.push_back(i)
  *                                             col.push_back(idx)
  *                                             val.push_back(coeff[m,l,k,j]*f1*f2*f3*f4)             # <<<<<<<<<<<<<<
@@ -5564,10 +5578,10 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
                         __pyx_v_val.push_back((((((*((__pyx_t_5numpy_float64_t *) ( /* dim=3 */ (( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_coeff.data + __pyx_t_23 * __pyx_v_coeff.strides[0]) ) + __pyx_t_24 * __pyx_v_coeff.strides[1]) ) + __pyx_t_25 * __pyx_v_coeff.strides[2]) ) + __pyx_t_26 * __pyx_v_coeff.strides[3]) ))) * __pyx_v_f1) * __pyx_v_f2) * __pyx_v_f3) * __pyx_v_f4));
                       } catch(...) {
                         __Pyx_CppExn2PyErr();
-                        __PYX_ERR(0, 243, __pyx_L1_error)
+                        __PYX_ERR(0, 242, __pyx_L1_error)
                       }
 
-                      /* "pyqhe/cython/hamiltonian_cy.pyx":237
+                      /* "pyqhe/cython/hamiltonian_cy.pyx":236
  *                                         f4 = c_dagger(spp, m, sig1, Ldwn)
  * 
  *                                         if f3!=0 and f4 !=0:             # <<<<<<<<<<<<<<
@@ -5576,7 +5590,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
  */
                     }
 
-                    /* "pyqhe/cython/hamiltonian_cy.pyx":232
+                    /* "pyqhe/cython/hamiltonian_cy.pyx":231
  *                                     spp[:] = sp
  *                                     m = j+k-l
  *                                     if m>=0 and m<Ldwn:             # <<<<<<<<<<<<<<
@@ -5586,7 +5600,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
                   }
                 }
 
-                /* "pyqhe/cython/hamiltonian_cy.pyx":227
+                /* "pyqhe/cython/hamiltonian_cy.pyx":226
  *                             f1 = c_(sp, j, sig1, Ldwn)
  *                             f2 = c_(sp, k, sig2, Ldwn)
  *                             if f1!=0 and f2 !=0:             # <<<<<<<<<<<<<<
@@ -5597,7 +5611,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
             }
           }
 
-          /* "pyqhe/cython/hamiltonian_cy.pyx":219
+          /* "pyqhe/cython/hamiltonian_cy.pyx":218
  *         for sig1 in range(2):
  *             for sig2 in range(2):
  *                 if sig1!=sig2:             # <<<<<<<<<<<<<<
@@ -5609,21 +5623,23 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
     }
   }
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":245
+  /* "pyqhe/cython/hamiltonian_cy.pyx":244
  *                                             val.push_back(coeff[m,l,k,j]*f1*f2*f3*f4)
  * 
  *     return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))             # <<<<<<<<<<<<<<
+ * 
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_coo_matrix); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_coo_matrix); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __pyx_convert_vector_to_py_double(__pyx_v_val); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_3 = __pyx_convert_vector_to_py_double(__pyx_v_val); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __pyx_convert_vector_to_py_int(__pyx_v_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert_vector_to_py_int(__pyx_v_row); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __pyx_convert_vector_to_py_int(__pyx_v_col); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_4 = __pyx_convert_vector_to_py_int(__pyx_v_col); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_27 = PyTuple_New(2); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_27 = PyTuple_New(2); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_27);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_27, 0, __pyx_t_2);
@@ -5631,7 +5647,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_27, 1, __pyx_t_4);
   __pyx_t_2 = 0;
   __pyx_t_4 = 0;
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
@@ -5639,25 +5655,25 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_27);
   __pyx_t_3 = 0;
   __pyx_t_27 = 0;
-  __pyx_t_27 = PyTuple_New(1); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_27 = PyTuple_New(1); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_27);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_27, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 245, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_28 = PyTuple_New(2); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_28 = PyTuple_New(2); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_28);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_28, 0, __pyx_t_2);
@@ -5665,9 +5681,9 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   PyTuple_SET_ITEM(__pyx_t_28, 1, __pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_shape, __pyx_t_28) < 0) __PYX_ERR(0, 245, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_shape, __pyx_t_28) < 0) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_28); __pyx_t_28 = 0;
-  __pyx_t_28 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_27, __pyx_t_4); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_28 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_27, __pyx_t_4); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_28);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
@@ -5676,7 +5692,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   __pyx_t_28 = 0;
   goto __pyx_L0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":185
+  /* "pyqhe/cython/hamiltonian_cy.pyx":184
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def quadratic_delta(data_type_t [:,:] basis, np.float64_t [:,:,:,:] coeff, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
@@ -5706,6 +5722,1372 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) <
   __PYX_XDEC_MEMVIEW(&__pyx_v_spp, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_basis, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_coeff, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pyqhe/cython/hamiltonian_cy.pyx":248
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * @cython.wraparound(False)  # turn off negative index wrapping for entire function
+ * def density_matrix(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t sig, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
+ *     """
+ *     Computes the density matrix \rho_ij^(spin1, spin2)
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_13density_matrix(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_5pyqhe_6cython_14hamiltonian_cy_12density_matrix[] = "\n    Computes the density matrix \rho_ij^(spin1, spin2)\n    :param basis: all basis states, shape [Nstates, mtotal]\n    :param Ldwn: cutoff for one spin sector\n    :return: \rho_ij\n    ";
+static PyMethodDef __pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_13density_matrix = {"density_matrix", (PyCFunction)__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_13density_matrix, METH_VARARGS|METH_KEYWORDS, __pyx_doc_5pyqhe_6cython_14hamiltonian_cy_12density_matrix};
+static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_13density_matrix(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_state_vec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_basis = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __pyx_t_5numpy_int32_t __pyx_v_sig;
+  __pyx_t_5numpy_uint32_t __pyx_v_Ldwn;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("density_matrix (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_state_vec,&__pyx_n_s_basis,&__pyx_n_s_sig,&__pyx_n_s_Ldwn,0};
+    PyObject* values[4] = {0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_state_vec)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_basis)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("density_matrix", 1, 4, 4, 1); __PYX_ERR(0, 248, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sig)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("density_matrix", 1, 4, 4, 2); __PYX_ERR(0, 248, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Ldwn)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("density_matrix", 1, 4, 4, 3); __PYX_ERR(0, 248, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "density_matrix") < 0)) __PYX_ERR(0, 248, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+    }
+    __pyx_v_state_vec = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5numpy_float64_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_state_vec.memview)) __PYX_ERR(0, 248, __pyx_L3_error)
+    __pyx_v_basis = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_basis.memview)) __PYX_ERR(0, 248, __pyx_L3_error)
+    __pyx_v_sig = __Pyx_PyInt_As_npy_int32(values[2]); if (unlikely((__pyx_v_sig == ((npy_int32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 248, __pyx_L3_error)
+    __pyx_v_Ldwn = __Pyx_PyInt_As_npy_uint32(values[3]); if (unlikely((__pyx_v_Ldwn == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 248, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("density_matrix", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 248, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.density_matrix", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5pyqhe_6cython_14hamiltonian_cy_12density_matrix(__pyx_self, __pyx_v_state_vec, __pyx_v_basis, __pyx_v_sig, __pyx_v_Ldwn);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_12density_matrix(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_state_vec, __Pyx_memviewslice __pyx_v_basis, __pyx_t_5numpy_int32_t __pyx_v_sig, __pyx_t_5numpy_uint32_t __pyx_v_Ldwn) {
+  Py_ssize_t __pyx_v_Nstates;
+  Py_ssize_t __pyx_v_L;
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_k;
+  int __pyx_v_f1;
+  int __pyx_v_f3;
+  int __pyx_v_idx;
+  PyObject *__pyx_v_lut = NULL;
+  PyObject *__pyx_v_cy_lut = 0;
+  PyObject *__pyx_v_state_np = NULL;
+  PyObject *__pyx_v_sp_np = NULL;
+  PyObject *__pyx_v_spp_np = NULL;
+  __Pyx_memviewslice __pyx_v_state = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_sp = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_spp = { 0, 0, { 0 }, { 0 }, { 0 } };
+  PyObject *__pyx_v_rho = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  __Pyx_memviewslice __pyx_t_5 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  PyObject *__pyx_t_6 = NULL;
+  Py_ssize_t __pyx_t_7;
+  Py_ssize_t __pyx_t_8;
+  int __pyx_t_9;
+  __pyx_t_5numpy_uint32_t __pyx_t_10;
+  __pyx_t_5numpy_uint32_t __pyx_t_11;
+  int __pyx_t_12;
+  int __pyx_t_13;
+  __pyx_t_5numpy_uint32_t __pyx_t_14;
+  __pyx_t_5numpy_uint32_t __pyx_t_15;
+  int __pyx_t_16;
+  int __pyx_t_17;
+  Py_ssize_t __pyx_t_18;
+  Py_ssize_t __pyx_t_19;
+  __Pyx_RefNannySetupContext("density_matrix", 0);
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":255
+ *     :return: \rho_ij
+ *     """
+ *     cdef Py_ssize_t Nstates = basis.shape[0]             # <<<<<<<<<<<<<<
+ *     cdef Py_ssize_t L = basis.shape[1]
+ *     cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+ */
+  __pyx_v_Nstates = (__pyx_v_basis.shape[0]);
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":256
+ *     """
+ *     cdef Py_ssize_t Nstates = basis.shape[0]
+ *     cdef Py_ssize_t L = basis.shape[1]             # <<<<<<<<<<<<<<
+ *     cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+ * 
+ */
+  __pyx_v_L = (__pyx_v_basis.shape[1]);
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":259
+ *     cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+ * 
+ *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))             # <<<<<<<<<<<<<<
+ *     cdef dict cy_lut = lut
+ * 
+ */
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_basis, 2, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(((PyObject *)(&PyTuple_Type)));
+  __Pyx_GIVEREF(((PyObject *)(&PyTuple_Type)));
+  PyTuple_SET_ITEM(__pyx_t_2, 0, ((PyObject *)(&PyTuple_Type)));
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
+  __pyx_t_2 = 0;
+  __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyDict_Type)), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_lut = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":260
+ * 
+ *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))
+ *     cdef dict cy_lut = lut             # <<<<<<<<<<<<<<
+ * 
+ *     state_np =  np.zeros(L, dtype=data_type)
+ */
+  __Pyx_INCREF(__pyx_v_lut);
+  __pyx_v_cy_lut = __pyx_v_lut;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":262
+ *     cdef dict cy_lut = lut
+ * 
+ *     state_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
+ *     sp_np =  np.zeros(L, dtype=data_type)
+ *     spp_np =  np.zeros(L, dtype=data_type)
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_state_np = __pyx_t_4;
+  __pyx_t_4 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":263
+ * 
+ *     state_np =  np.zeros(L, dtype=data_type)
+ *     sp_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
+ *     spp_np =  np.zeros(L, dtype=data_type)
+ *     cdef data_type_t [:] state = state_np
+ */
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
+  __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_v_sp_np = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":264
+ *     state_np =  np.zeros(L, dtype=data_type)
+ *     sp_np =  np.zeros(L, dtype=data_type)
+ *     spp_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
+ *     cdef data_type_t [:] state = state_np
+ *     cdef data_type_t [:] sp = sp_np
+ */
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
+  __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_spp_np = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":265
+ *     sp_np =  np.zeros(L, dtype=data_type)
+ *     spp_np =  np.zeros(L, dtype=data_type)
+ *     cdef data_type_t [:] state = state_np             # <<<<<<<<<<<<<<
+ *     cdef data_type_t [:] sp = sp_np
+ *     cdef data_type_t [:] spp = spp_np
+ */
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_state_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_v_state = __pyx_t_5;
+  __pyx_t_5.memview = NULL;
+  __pyx_t_5.data = NULL;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":266
+ *     spp_np =  np.zeros(L, dtype=data_type)
+ *     cdef data_type_t [:] state = state_np
+ *     cdef data_type_t [:] sp = sp_np             # <<<<<<<<<<<<<<
+ *     cdef data_type_t [:] spp = spp_np
+ * 
+ */
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_sp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 266, __pyx_L1_error)
+  __pyx_v_sp = __pyx_t_5;
+  __pyx_t_5.memview = NULL;
+  __pyx_t_5.data = NULL;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":267
+ *     cdef data_type_t [:] state = state_np
+ *     cdef data_type_t [:] sp = sp_np
+ *     cdef data_type_t [:] spp = spp_np             # <<<<<<<<<<<<<<
+ * 
+ *     rho =  np.zeros((Ldwn,Ldwn), dtype=np.float64)
+ */
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_spp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_v_spp = __pyx_t_5;
+  __pyx_t_5.memview = NULL;
+  __pyx_t_5.data = NULL;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":269
+ *     cdef data_type_t [:] spp = spp_np
+ * 
+ *     rho =  np.zeros((Ldwn,Ldwn), dtype=np.float64)             # <<<<<<<<<<<<<<
+ * 
+ *     for i in range(Nstates):
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyInt_From_npy_uint32(__pyx_v_Ldwn); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyInt_From_npy_uint32(__pyx_v_Ldwn); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_2);
+  __pyx_t_1 = 0;
+  __pyx_t_2 = 0;
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
+  __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_float64); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_v_rho = __pyx_t_6;
+  __pyx_t_6 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":271
+ *     rho =  np.zeros((Ldwn,Ldwn), dtype=np.float64)
+ * 
+ *     for i in range(Nstates):             # <<<<<<<<<<<<<<
+ *         state[:] = basis[i,:]
+ *         for j in range(Ldwn):
+ */
+  __pyx_t_7 = __pyx_v_Nstates;
+  __pyx_t_8 = __pyx_t_7;
+  for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
+    __pyx_v_i = __pyx_t_9;
+
+    /* "pyqhe/cython/hamiltonian_cy.pyx":272
+ * 
+ *     for i in range(Nstates):
+ *         state[:] = basis[i,:]             # <<<<<<<<<<<<<<
+ *         for j in range(Ldwn):
+ *             sp[:] = state
+ */
+    __pyx_t_5.data = __pyx_v_basis.data;
+    __pyx_t_5.memview = __pyx_v_basis.memview;
+    __PYX_INC_MEMVIEW(&__pyx_t_5, 0);
+    {
+    Py_ssize_t __pyx_tmp_idx = __pyx_v_i;
+    Py_ssize_t __pyx_tmp_shape = __pyx_v_basis.shape[0];
+    Py_ssize_t __pyx_tmp_stride = __pyx_v_basis.strides[0];
+    if (0 && (__pyx_tmp_idx < 0))
+        __pyx_tmp_idx += __pyx_tmp_shape;
+    if (0 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
+        PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
+        __PYX_ERR(0, 272, __pyx_L1_error)
+    }
+        __pyx_t_5.data += __pyx_tmp_idx * __pyx_tmp_stride;
+}
+
+__pyx_t_5.shape[0] = __pyx_v_basis.shape[1];
+__pyx_t_5.strides[0] = __pyx_v_basis.strides[1];
+    __pyx_t_5.suboffsets[0] = -1;
+
+if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) < 0)) __PYX_ERR(0, 272, __pyx_L1_error)
+    __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+    __pyx_t_5.memview = NULL;
+    __pyx_t_5.data = NULL;
+
+    /* "pyqhe/cython/hamiltonian_cy.pyx":273
+ *     for i in range(Nstates):
+ *         state[:] = basis[i,:]
+ *         for j in range(Ldwn):             # <<<<<<<<<<<<<<
+ *             sp[:] = state
+ *             #print('sp b',j,k, tuple(sp))
+ */
+    __pyx_t_10 = __pyx_v_Ldwn;
+    __pyx_t_11 = __pyx_t_10;
+    for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
+      __pyx_v_j = __pyx_t_12;
+
+      /* "pyqhe/cython/hamiltonian_cy.pyx":274
+ *         state[:] = basis[i,:]
+ *         for j in range(Ldwn):
+ *             sp[:] = state             # <<<<<<<<<<<<<<
+ *             #print('sp b',j,k, tuple(sp))
+ *             #check if two states j and k are occupied
+ */
+      if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_state, __pyx_v_sp, 1, 1, 0) < 0)) __PYX_ERR(0, 274, __pyx_L1_error)
+
+      /* "pyqhe/cython/hamiltonian_cy.pyx":277
+ *             #print('sp b',j,k, tuple(sp))
+ *             #check if two states j and k are occupied
+ *             f1 = c_(sp, j, sig, Ldwn)             # <<<<<<<<<<<<<<
+ *             if f1!=0 :
+ *                 #print('sp', j,k, tuple(sp))
+ */
+      __pyx_v_f1 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_sp, __pyx_v_j, __pyx_v_sig, __pyx_v_Ldwn, 0);
+
+      /* "pyqhe/cython/hamiltonian_cy.pyx":278
+ *             #check if two states j and k are occupied
+ *             f1 = c_(sp, j, sig, Ldwn)
+ *             if f1!=0 :             # <<<<<<<<<<<<<<
+ *                 #print('sp', j,k, tuple(sp))
+ *                 for k in range(Ldwn):
+ */
+      __pyx_t_13 = ((__pyx_v_f1 != 0) != 0);
+      if (__pyx_t_13) {
+
+        /* "pyqhe/cython/hamiltonian_cy.pyx":280
+ *             if f1!=0 :
+ *                 #print('sp', j,k, tuple(sp))
+ *                 for k in range(Ldwn):             # <<<<<<<<<<<<<<
+ *                     spp[:] = sp
+ *                     f3 = c_dagger(spp, k, sig, Ldwn)
+ */
+        __pyx_t_14 = __pyx_v_Ldwn;
+        __pyx_t_15 = __pyx_t_14;
+        for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
+          __pyx_v_k = __pyx_t_16;
+
+          /* "pyqhe/cython/hamiltonian_cy.pyx":281
+ *                 #print('sp', j,k, tuple(sp))
+ *                 for k in range(Ldwn):
+ *                     spp[:] = sp             # <<<<<<<<<<<<<<
+ *                     f3 = c_dagger(spp, k, sig, Ldwn)
+ *                     if f3!=0:
+ */
+          if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_sp, __pyx_v_spp, 1, 1, 0) < 0)) __PYX_ERR(0, 281, __pyx_L1_error)
+
+          /* "pyqhe/cython/hamiltonian_cy.pyx":282
+ *                 for k in range(Ldwn):
+ *                     spp[:] = sp
+ *                     f3 = c_dagger(spp, k, sig, Ldwn)             # <<<<<<<<<<<<<<
+ *                     if f3!=0:
+ *                         #print('spp', l ,m, tuple(spp))
+ */
+          __pyx_v_f3 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_spp, __pyx_v_k, __pyx_v_sig, __pyx_v_Ldwn, 0);
+
+          /* "pyqhe/cython/hamiltonian_cy.pyx":283
+ *                     spp[:] = sp
+ *                     f3 = c_dagger(spp, k, sig, Ldwn)
+ *                     if f3!=0:             # <<<<<<<<<<<<<<
+ *                         #print('spp', l ,m, tuple(spp))
+ *                         idx = cy_lut[tuple(spp)]
+ */
+          __pyx_t_13 = ((__pyx_v_f3 != 0) != 0);
+          if (__pyx_t_13) {
+
+            /* "pyqhe/cython/hamiltonian_cy.pyx":285
+ *                     if f3!=0:
+ *                         #print('spp', l ,m, tuple(spp))
+ *                         idx = cy_lut[tuple(spp)]             # <<<<<<<<<<<<<<
+ *                         #print(i, idx)
+ *                         rho[k,j] += f1*f3*state_vec[i]*state_vec[idx]
+ */
+            __pyx_t_6 = __pyx_memoryview_fromslice(__pyx_v_spp, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 285, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_4);
+            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+            __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_cy_lut, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_6); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L1_error)
+            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+            __pyx_v_idx = __pyx_t_17;
+
+            /* "pyqhe/cython/hamiltonian_cy.pyx":287
+ *                         idx = cy_lut[tuple(spp)]
+ *                         #print(i, idx)
+ *                         rho[k,j] += f1*f3*state_vec[i]*state_vec[idx]             # <<<<<<<<<<<<<<
+ * 
+ *     return rho
+ */
+            __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_k); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 287, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_j); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 287, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_4);
+            __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_2);
+            __Pyx_GIVEREF(__pyx_t_6);
+            PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_6);
+            __Pyx_GIVEREF(__pyx_t_4);
+            PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_4);
+            __pyx_t_6 = 0;
+            __pyx_t_4 = 0;
+            __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_rho, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 287, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_4);
+            __pyx_t_18 = __pyx_v_i;
+            __pyx_t_19 = __pyx_v_idx;
+            __pyx_t_6 = PyFloat_FromDouble((((__pyx_v_f1 * __pyx_v_f3) * (*((__pyx_t_5numpy_float64_t *) ( /* dim=0 */ (__pyx_v_state_vec.data + __pyx_t_18 * __pyx_v_state_vec.strides[0]) )))) * (*((__pyx_t_5numpy_float64_t *) ( /* dim=0 */ (__pyx_v_state_vec.data + __pyx_t_19 * __pyx_v_state_vec.strides[0]) ))))); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 287, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_3);
+            __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+            if (unlikely(PyObject_SetItem(__pyx_v_rho, __pyx_t_2, __pyx_t_3) < 0)) __PYX_ERR(0, 287, __pyx_L1_error)
+            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+            /* "pyqhe/cython/hamiltonian_cy.pyx":283
+ *                     spp[:] = sp
+ *                     f3 = c_dagger(spp, k, sig, Ldwn)
+ *                     if f3!=0:             # <<<<<<<<<<<<<<
+ *                         #print('spp', l ,m, tuple(spp))
+ *                         idx = cy_lut[tuple(spp)]
+ */
+          }
+        }
+
+        /* "pyqhe/cython/hamiltonian_cy.pyx":278
+ *             #check if two states j and k are occupied
+ *             f1 = c_(sp, j, sig, Ldwn)
+ *             if f1!=0 :             # <<<<<<<<<<<<<<
+ *                 #print('sp', j,k, tuple(sp))
+ *                 for k in range(Ldwn):
+ */
+      }
+    }
+  }
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":289
+ *                         rho[k,j] += f1*f3*state_vec[i]*state_vec[idx]
+ * 
+ *     return rho             # <<<<<<<<<<<<<<
+ * 
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_rho);
+  __pyx_r = __pyx_v_rho;
+  goto __pyx_L0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":248
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * @cython.wraparound(False)  # turn off negative index wrapping for entire function
+ * def density_matrix(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t sig, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
+ *     """
+ *     Computes the density matrix \rho_ij^(spin1, spin2)
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.density_matrix", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_lut);
+  __Pyx_XDECREF(__pyx_v_cy_lut);
+  __Pyx_XDECREF(__pyx_v_state_np);
+  __Pyx_XDECREF(__pyx_v_sp_np);
+  __Pyx_XDECREF(__pyx_v_spp_np);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_state, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_sp, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_spp, 1);
+  __Pyx_XDECREF(__pyx_v_rho);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_state_vec, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_basis, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pyqhe/cython/hamiltonian_cy.pyx":293
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * @cython.wraparound(False)  # turn off negative index wrapping for entire function
+ * def density_matrix_two(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t sig1, np.int32_t sig2, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
+ *     """
+ *     Computes the density matrix \rho_ijkl^(spin1, spin2)
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_15density_matrix_two(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_5pyqhe_6cython_14hamiltonian_cy_14density_matrix_two[] = "\n    Computes the density matrix \rho_ijkl^(spin1, spin2)\n    :param basis: all basis states, shape [Nstates, mtotal]\n    :param Ldwn: cutoff for one spin sector\n    :return: \rho_ijkl\n    ";
+static PyMethodDef __pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_15density_matrix_two = {"density_matrix_two", (PyCFunction)__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_15density_matrix_two, METH_VARARGS|METH_KEYWORDS, __pyx_doc_5pyqhe_6cython_14hamiltonian_cy_14density_matrix_two};
+static PyObject *__pyx_pw_5pyqhe_6cython_14hamiltonian_cy_15density_matrix_two(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_state_vec = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_basis = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __pyx_t_5numpy_int32_t __pyx_v_sig1;
+  __pyx_t_5numpy_int32_t __pyx_v_sig2;
+  __pyx_t_5numpy_uint32_t __pyx_v_Ldwn;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("density_matrix_two (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_state_vec,&__pyx_n_s_basis,&__pyx_n_s_sig1,&__pyx_n_s_sig2,&__pyx_n_s_Ldwn,0};
+    PyObject* values[5] = {0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_state_vec)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_basis)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("density_matrix_two", 1, 5, 5, 1); __PYX_ERR(0, 293, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sig1)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("density_matrix_two", 1, 5, 5, 2); __PYX_ERR(0, 293, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sig2)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("density_matrix_two", 1, 5, 5, 3); __PYX_ERR(0, 293, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Ldwn)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("density_matrix_two", 1, 5, 5, 4); __PYX_ERR(0, 293, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "density_matrix_two") < 0)) __PYX_ERR(0, 293, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+    }
+    __pyx_v_state_vec = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5numpy_float64_t(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_state_vec.memview)) __PYX_ERR(0, 293, __pyx_L3_error)
+    __pyx_v_basis = __Pyx_PyObject_to_MemoryviewSlice_dsds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_basis.memview)) __PYX_ERR(0, 293, __pyx_L3_error)
+    __pyx_v_sig1 = __Pyx_PyInt_As_npy_int32(values[2]); if (unlikely((__pyx_v_sig1 == ((npy_int32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 293, __pyx_L3_error)
+    __pyx_v_sig2 = __Pyx_PyInt_As_npy_int32(values[3]); if (unlikely((__pyx_v_sig2 == ((npy_int32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 293, __pyx_L3_error)
+    __pyx_v_Ldwn = __Pyx_PyInt_As_npy_uint32(values[4]); if (unlikely((__pyx_v_Ldwn == ((npy_uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 293, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("density_matrix_two", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 293, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.density_matrix_two", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5pyqhe_6cython_14hamiltonian_cy_14density_matrix_two(__pyx_self, __pyx_v_state_vec, __pyx_v_basis, __pyx_v_sig1, __pyx_v_sig2, __pyx_v_Ldwn);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5pyqhe_6cython_14hamiltonian_cy_14density_matrix_two(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_state_vec, __Pyx_memviewslice __pyx_v_basis, __pyx_t_5numpy_int32_t __pyx_v_sig1, __pyx_t_5numpy_int32_t __pyx_v_sig2, __pyx_t_5numpy_uint32_t __pyx_v_Ldwn) {
+  Py_ssize_t __pyx_v_Nstates;
+  Py_ssize_t __pyx_v_L;
+  int __pyx_v_i;
+  int __pyx_v_j;
+  int __pyx_v_k;
+  int __pyx_v_l;
+  int __pyx_v_m;
+  int __pyx_v_f1;
+  int __pyx_v_f2;
+  int __pyx_v_f3;
+  int __pyx_v_f4;
+  int __pyx_v_idx;
+  PyObject *__pyx_v_lut = NULL;
+  PyObject *__pyx_v_cy_lut = 0;
+  PyObject *__pyx_v_state_np = NULL;
+  PyObject *__pyx_v_sp_np = NULL;
+  PyObject *__pyx_v_spp_np = NULL;
+  __Pyx_memviewslice __pyx_v_state = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_sp = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_spp = { 0, 0, { 0 }, { 0 }, { 0 } };
+  PyObject *__pyx_v_rho = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  __Pyx_memviewslice __pyx_t_5 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  Py_ssize_t __pyx_t_8;
+  Py_ssize_t __pyx_t_9;
+  int __pyx_t_10;
+  __pyx_t_5numpy_uint32_t __pyx_t_11;
+  __pyx_t_5numpy_uint32_t __pyx_t_12;
+  int __pyx_t_13;
+  __pyx_t_5numpy_uint32_t __pyx_t_14;
+  __pyx_t_5numpy_uint32_t __pyx_t_15;
+  int __pyx_t_16;
+  int __pyx_t_17;
+  int __pyx_t_18;
+  __pyx_t_5numpy_uint32_t __pyx_t_19;
+  __pyx_t_5numpy_uint32_t __pyx_t_20;
+  int __pyx_t_21;
+  __pyx_t_5numpy_uint32_t __pyx_t_22;
+  __pyx_t_5numpy_uint32_t __pyx_t_23;
+  int __pyx_t_24;
+  int __pyx_t_25;
+  Py_ssize_t __pyx_t_26;
+  Py_ssize_t __pyx_t_27;
+  __Pyx_RefNannySetupContext("density_matrix_two", 0);
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":300
+ *     :return: \rho_ijkl
+ *     """
+ *     cdef Py_ssize_t Nstates = basis.shape[0]             # <<<<<<<<<<<<<<
+ *     cdef Py_ssize_t L = basis.shape[1]
+ *     cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+ */
+  __pyx_v_Nstates = (__pyx_v_basis.shape[0]);
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":301
+ *     """
+ *     cdef Py_ssize_t Nstates = basis.shape[0]
+ *     cdef Py_ssize_t L = basis.shape[1]             # <<<<<<<<<<<<<<
+ *     cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+ * 
+ */
+  __pyx_v_L = (__pyx_v_basis.shape[1]);
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":304
+ *     cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+ * 
+ *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))             # <<<<<<<<<<<<<<
+ *     cdef dict cy_lut = lut
+ * 
+ */
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_basis, 2, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(((PyObject *)(&PyTuple_Type)));
+  __Pyx_GIVEREF(((PyObject *)(&PyTuple_Type)));
+  PyTuple_SET_ITEM(__pyx_t_2, 0, ((PyObject *)(&PyTuple_Type)));
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_Nstates); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
+  __pyx_t_2 = 0;
+  __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyDict_Type)), __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_lut = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":305
+ * 
+ *     lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))
+ *     cdef dict cy_lut = lut             # <<<<<<<<<<<<<<
+ * 
+ *     state_np =  np.zeros(L, dtype=data_type)
+ */
+  __Pyx_INCREF(__pyx_v_lut);
+  __pyx_v_cy_lut = __pyx_v_lut;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":307
+ *     cdef dict cy_lut = lut
+ * 
+ *     state_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
+ *     sp_np =  np.zeros(L, dtype=data_type)
+ *     spp_np =  np.zeros(L, dtype=data_type)
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 307, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_state_np = __pyx_t_4;
+  __pyx_t_4 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":308
+ * 
+ *     state_np =  np.zeros(L, dtype=data_type)
+ *     sp_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
+ *     spp_np =  np.zeros(L, dtype=data_type)
+ *     cdef data_type_t [:] state = state_np
+ */
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
+  __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(0, 308, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_v_sp_np = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":309
+ *     state_np =  np.zeros(L, dtype=data_type)
+ *     sp_np =  np.zeros(L, dtype=data_type)
+ *     spp_np =  np.zeros(L, dtype=data_type)             # <<<<<<<<<<<<<<
+ *     cdef data_type_t [:] state = state_np
+ *     cdef data_type_t [:] sp = sp_np
+ */
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_L); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
+  __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_data_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_1) < 0) __PYX_ERR(0, 309, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_spp_np = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":310
+ *     sp_np =  np.zeros(L, dtype=data_type)
+ *     spp_np =  np.zeros(L, dtype=data_type)
+ *     cdef data_type_t [:] state = state_np             # <<<<<<<<<<<<<<
+ *     cdef data_type_t [:] sp = sp_np
+ *     cdef data_type_t [:] spp = spp_np
+ */
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_state_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 310, __pyx_L1_error)
+  __pyx_v_state = __pyx_t_5;
+  __pyx_t_5.memview = NULL;
+  __pyx_t_5.data = NULL;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":311
+ *     spp_np =  np.zeros(L, dtype=data_type)
+ *     cdef data_type_t [:] state = state_np
+ *     cdef data_type_t [:] sp = sp_np             # <<<<<<<<<<<<<<
+ *     cdef data_type_t [:] spp = spp_np
+ * 
+ */
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_sp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 311, __pyx_L1_error)
+  __pyx_v_sp = __pyx_t_5;
+  __pyx_t_5.memview = NULL;
+  __pyx_t_5.data = NULL;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":312
+ *     cdef data_type_t [:] state = state_np
+ *     cdef data_type_t [:] sp = sp_np
+ *     cdef data_type_t [:] spp = spp_np             # <<<<<<<<<<<<<<
+ * 
+ *     rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.float64)
+ */
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t(__pyx_v_spp_np, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 312, __pyx_L1_error)
+  __pyx_v_spp = __pyx_t_5;
+  __pyx_t_5.memview = NULL;
+  __pyx_t_5.data = NULL;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":314
+ *     cdef data_type_t [:] spp = spp_np
+ * 
+ *     rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.float64)             # <<<<<<<<<<<<<<
+ * 
+ *     for i in range(Nstates):
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyInt_From_npy_uint32(__pyx_v_Ldwn); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyInt_From_npy_uint32(__pyx_v_Ldwn); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyInt_From_npy_uint32(__pyx_v_Ldwn); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_6 = __Pyx_PyInt_From_npy_uint32(__pyx_v_Ldwn); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_7 = PyTuple_New(4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_6);
+  PyTuple_SET_ITEM(__pyx_t_7, 3, __pyx_t_6);
+  __pyx_t_1 = 0;
+  __pyx_t_2 = 0;
+  __pyx_t_4 = 0;
+  __pyx_t_6 = 0;
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_GIVEREF(__pyx_t_7);
+  PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7);
+  __pyx_t_7 = 0;
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float64); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_dtype, __pyx_t_2) < 0) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_v_rho = __pyx_t_2;
+  __pyx_t_2 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":316
+ *     rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.float64)
+ * 
+ *     for i in range(Nstates):             # <<<<<<<<<<<<<<
+ *         state[:] = basis[i,:]
+ *         for j in range(Ldwn):
+ */
+  __pyx_t_8 = __pyx_v_Nstates;
+  __pyx_t_9 = __pyx_t_8;
+  for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
+    __pyx_v_i = __pyx_t_10;
+
+    /* "pyqhe/cython/hamiltonian_cy.pyx":317
+ * 
+ *     for i in range(Nstates):
+ *         state[:] = basis[i,:]             # <<<<<<<<<<<<<<
+ *         for j in range(Ldwn):
+ *             for k in range(Ldwn):
+ */
+    __pyx_t_5.data = __pyx_v_basis.data;
+    __pyx_t_5.memview = __pyx_v_basis.memview;
+    __PYX_INC_MEMVIEW(&__pyx_t_5, 0);
+    {
+    Py_ssize_t __pyx_tmp_idx = __pyx_v_i;
+    Py_ssize_t __pyx_tmp_shape = __pyx_v_basis.shape[0];
+    Py_ssize_t __pyx_tmp_stride = __pyx_v_basis.strides[0];
+    if (0 && (__pyx_tmp_idx < 0))
+        __pyx_tmp_idx += __pyx_tmp_shape;
+    if (0 && (__pyx_tmp_idx < 0 || __pyx_tmp_idx >= __pyx_tmp_shape)) {
+        PyErr_SetString(PyExc_IndexError, "Index out of bounds (axis 0)");
+        __PYX_ERR(0, 317, __pyx_L1_error)
+    }
+        __pyx_t_5.data += __pyx_tmp_idx * __pyx_tmp_stride;
+}
+
+__pyx_t_5.shape[0] = __pyx_v_basis.shape[1];
+__pyx_t_5.strides[0] = __pyx_v_basis.strides[1];
+    __pyx_t_5.suboffsets[0] = -1;
+
+if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_5, __pyx_v_state, 1, 1, 0) < 0)) __PYX_ERR(0, 317, __pyx_L1_error)
+    __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+    __pyx_t_5.memview = NULL;
+    __pyx_t_5.data = NULL;
+
+    /* "pyqhe/cython/hamiltonian_cy.pyx":318
+ *     for i in range(Nstates):
+ *         state[:] = basis[i,:]
+ *         for j in range(Ldwn):             # <<<<<<<<<<<<<<
+ *             for k in range(Ldwn):
+ *                 sp[:] = state
+ */
+    __pyx_t_11 = __pyx_v_Ldwn;
+    __pyx_t_12 = __pyx_t_11;
+    for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
+      __pyx_v_j = __pyx_t_13;
+
+      /* "pyqhe/cython/hamiltonian_cy.pyx":319
+ *         state[:] = basis[i,:]
+ *         for j in range(Ldwn):
+ *             for k in range(Ldwn):             # <<<<<<<<<<<<<<
+ *                 sp[:] = state
+ *                 #check if two states j and k are occupied
+ */
+      __pyx_t_14 = __pyx_v_Ldwn;
+      __pyx_t_15 = __pyx_t_14;
+      for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
+        __pyx_v_k = __pyx_t_16;
+
+        /* "pyqhe/cython/hamiltonian_cy.pyx":320
+ *         for j in range(Ldwn):
+ *             for k in range(Ldwn):
+ *                 sp[:] = state             # <<<<<<<<<<<<<<
+ *                 #check if two states j and k are occupied
+ *                 f1 = c_(sp, j, sig1, Ldwn)
+ */
+        if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_state, __pyx_v_sp, 1, 1, 0) < 0)) __PYX_ERR(0, 320, __pyx_L1_error)
+
+        /* "pyqhe/cython/hamiltonian_cy.pyx":322
+ *                 sp[:] = state
+ *                 #check if two states j and k are occupied
+ *                 f1 = c_(sp, j, sig1, Ldwn)             # <<<<<<<<<<<<<<
+ *                 f2 = c_(sp, k, sig2, Ldwn)
+ *                 if f1!=0 and f2 !=0:
+ */
+        __pyx_v_f1 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_sp, __pyx_v_j, __pyx_v_sig1, __pyx_v_Ldwn, 0);
+
+        /* "pyqhe/cython/hamiltonian_cy.pyx":323
+ *                 #check if two states j and k are occupied
+ *                 f1 = c_(sp, j, sig1, Ldwn)
+ *                 f2 = c_(sp, k, sig2, Ldwn)             # <<<<<<<<<<<<<<
+ *                 if f1!=0 and f2 !=0:
+ *                     for l in range(Ldwn):
+ */
+        __pyx_v_f2 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_(__pyx_v_sp, __pyx_v_k, __pyx_v_sig2, __pyx_v_Ldwn, 0);
+
+        /* "pyqhe/cython/hamiltonian_cy.pyx":324
+ *                 f1 = c_(sp, j, sig1, Ldwn)
+ *                 f2 = c_(sp, k, sig2, Ldwn)
+ *                 if f1!=0 and f2 !=0:             # <<<<<<<<<<<<<<
+ *                     for l in range(Ldwn):
+ *                         for m in range(Ldwn):
+ */
+        __pyx_t_18 = ((__pyx_v_f1 != 0) != 0);
+        if (__pyx_t_18) {
+        } else {
+          __pyx_t_17 = __pyx_t_18;
+          goto __pyx_L10_bool_binop_done;
+        }
+        __pyx_t_18 = ((__pyx_v_f2 != 0) != 0);
+        __pyx_t_17 = __pyx_t_18;
+        __pyx_L10_bool_binop_done:;
+        if (__pyx_t_17) {
+
+          /* "pyqhe/cython/hamiltonian_cy.pyx":325
+ *                 f2 = c_(sp, k, sig2, Ldwn)
+ *                 if f1!=0 and f2 !=0:
+ *                     for l in range(Ldwn):             # <<<<<<<<<<<<<<
+ *                         for m in range(Ldwn):
+ *                             spp[:] = sp
+ */
+          __pyx_t_19 = __pyx_v_Ldwn;
+          __pyx_t_20 = __pyx_t_19;
+          for (__pyx_t_21 = 0; __pyx_t_21 < __pyx_t_20; __pyx_t_21+=1) {
+            __pyx_v_l = __pyx_t_21;
+
+            /* "pyqhe/cython/hamiltonian_cy.pyx":326
+ *                 if f1!=0 and f2 !=0:
+ *                     for l in range(Ldwn):
+ *                         for m in range(Ldwn):             # <<<<<<<<<<<<<<
+ *                             spp[:] = sp
+ *                             f3 = c_dagger(spp, l, sig2, Ldwn)
+ */
+            __pyx_t_22 = __pyx_v_Ldwn;
+            __pyx_t_23 = __pyx_t_22;
+            for (__pyx_t_24 = 0; __pyx_t_24 < __pyx_t_23; __pyx_t_24+=1) {
+              __pyx_v_m = __pyx_t_24;
+
+              /* "pyqhe/cython/hamiltonian_cy.pyx":327
+ *                     for l in range(Ldwn):
+ *                         for m in range(Ldwn):
+ *                             spp[:] = sp             # <<<<<<<<<<<<<<
+ *                             f3 = c_dagger(spp, l, sig2, Ldwn)
+ *                             f4 = c_dagger(spp, m, sig1, Ldwn)
+ */
+              if (unlikely(__pyx_memoryview_copy_contents(__pyx_v_sp, __pyx_v_spp, 1, 1, 0) < 0)) __PYX_ERR(0, 327, __pyx_L1_error)
+
+              /* "pyqhe/cython/hamiltonian_cy.pyx":328
+ *                         for m in range(Ldwn):
+ *                             spp[:] = sp
+ *                             f3 = c_dagger(spp, l, sig2, Ldwn)             # <<<<<<<<<<<<<<
+ *                             f4 = c_dagger(spp, m, sig1, Ldwn)
+ *                             if f3!=0 and f4 !=0:
+ */
+              __pyx_v_f3 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_spp, __pyx_v_l, __pyx_v_sig2, __pyx_v_Ldwn, 0);
+
+              /* "pyqhe/cython/hamiltonian_cy.pyx":329
+ *                             spp[:] = sp
+ *                             f3 = c_dagger(spp, l, sig2, Ldwn)
+ *                             f4 = c_dagger(spp, m, sig1, Ldwn)             # <<<<<<<<<<<<<<
+ *                             if f3!=0 and f4 !=0:
+ *                                 idx = cy_lut[tuple(spp)]
+ */
+              __pyx_v_f4 = __pyx_f_5pyqhe_6cython_14hamiltonian_cy_c_dagger(__pyx_v_spp, __pyx_v_m, __pyx_v_sig1, __pyx_v_Ldwn, 0);
+
+              /* "pyqhe/cython/hamiltonian_cy.pyx":330
+ *                             f3 = c_dagger(spp, l, sig2, Ldwn)
+ *                             f4 = c_dagger(spp, m, sig1, Ldwn)
+ *                             if f3!=0 and f4 !=0:             # <<<<<<<<<<<<<<
+ *                                 idx = cy_lut[tuple(spp)]
+ *                                 rho[m,l,k,j] += f1*f2*f3*f4*state_vec[i]*state_vec[idx]
+ */
+              __pyx_t_18 = ((__pyx_v_f3 != 0) != 0);
+              if (__pyx_t_18) {
+              } else {
+                __pyx_t_17 = __pyx_t_18;
+                goto __pyx_L17_bool_binop_done;
+              }
+              __pyx_t_18 = ((__pyx_v_f4 != 0) != 0);
+              __pyx_t_17 = __pyx_t_18;
+              __pyx_L17_bool_binop_done:;
+              if (__pyx_t_17) {
+
+                /* "pyqhe/cython/hamiltonian_cy.pyx":331
+ *                             f4 = c_dagger(spp, m, sig1, Ldwn)
+ *                             if f3!=0 and f4 !=0:
+ *                                 idx = cy_lut[tuple(spp)]             # <<<<<<<<<<<<<<
+ *                                 rho[m,l,k,j] += f1*f2*f3*f4*state_vec[i]*state_vec[idx]
+ * 
+ */
+                __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_spp, 1, (PyObject *(*)(char *)) __pyx_memview_get_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, (int (*)(char *, PyObject *)) __pyx_memview_set_nn___pyx_t_5pyqhe_6cython_14hamiltonian_cy_data_type_t, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_2);
+                __pyx_t_7 = __Pyx_PySequence_Tuple(__pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 331, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_cy_lut, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_2);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_25 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_25 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 331, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __pyx_v_idx = __pyx_t_25;
+
+                /* "pyqhe/cython/hamiltonian_cy.pyx":332
+ *                             if f3!=0 and f4 !=0:
+ *                                 idx = cy_lut[tuple(spp)]
+ *                                 rho[m,l,k,j] += f1*f2*f3*f4*state_vec[i]*state_vec[idx]             # <<<<<<<<<<<<<<
+ * 
+ *     return rho
+ */
+                __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_m); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_2);
+                __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_k); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_j); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                __pyx_t_4 = PyTuple_New(4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_4);
+                __Pyx_GIVEREF(__pyx_t_2);
+                PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
+                __Pyx_GIVEREF(__pyx_t_7);
+                PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_7);
+                __Pyx_GIVEREF(__pyx_t_6);
+                PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_t_6);
+                __Pyx_GIVEREF(__pyx_t_3);
+                PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_t_3);
+                __pyx_t_2 = 0;
+                __pyx_t_7 = 0;
+                __pyx_t_6 = 0;
+                __pyx_t_3 = 0;
+                __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_rho, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                __pyx_t_26 = __pyx_v_i;
+                __pyx_t_27 = __pyx_v_idx;
+                __pyx_t_6 = PyFloat_FromDouble((((((__pyx_v_f1 * __pyx_v_f2) * __pyx_v_f3) * __pyx_v_f4) * (*((__pyx_t_5numpy_float64_t *) ( /* dim=0 */ (__pyx_v_state_vec.data + __pyx_t_26 * __pyx_v_state_vec.strides[0]) )))) * (*((__pyx_t_5numpy_float64_t *) ( /* dim=0 */ (__pyx_v_state_vec.data + __pyx_t_27 * __pyx_v_state_vec.strides[0]) ))))); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                if (unlikely(PyObject_SetItem(__pyx_v_rho, __pyx_t_4, __pyx_t_7) < 0)) __PYX_ERR(0, 332, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+                /* "pyqhe/cython/hamiltonian_cy.pyx":330
+ *                             f3 = c_dagger(spp, l, sig2, Ldwn)
+ *                             f4 = c_dagger(spp, m, sig1, Ldwn)
+ *                             if f3!=0 and f4 !=0:             # <<<<<<<<<<<<<<
+ *                                 idx = cy_lut[tuple(spp)]
+ *                                 rho[m,l,k,j] += f1*f2*f3*f4*state_vec[i]*state_vec[idx]
+ */
+              }
+            }
+          }
+
+          /* "pyqhe/cython/hamiltonian_cy.pyx":324
+ *                 f1 = c_(sp, j, sig1, Ldwn)
+ *                 f2 = c_(sp, k, sig2, Ldwn)
+ *                 if f1!=0 and f2 !=0:             # <<<<<<<<<<<<<<
+ *                     for l in range(Ldwn):
+ *                         for m in range(Ldwn):
+ */
+        }
+      }
+    }
+  }
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":334
+ *                                 rho[m,l,k,j] += f1*f2*f3*f4*state_vec[i]*state_vec[idx]
+ * 
+ *     return rho             # <<<<<<<<<<<<<<
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_rho);
+  __pyx_r = __pyx_v_rho;
+  goto __pyx_L0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":293
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * @cython.wraparound(False)  # turn off negative index wrapping for entire function
+ * def density_matrix_two(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t sig1, np.int32_t sig2, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
+ *     """
+ *     Computes the density matrix \rho_ijkl^(spin1, spin2)
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_AddTraceback("pyqhe.cython.hamiltonian_cy.density_matrix_two", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_lut);
+  __Pyx_XDECREF(__pyx_v_cy_lut);
+  __Pyx_XDECREF(__pyx_v_state_np);
+  __Pyx_XDECREF(__pyx_v_sp_np);
+  __Pyx_XDECREF(__pyx_v_spp_np);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_state, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_sp, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_spp, 1);
+  __Pyx_XDECREF(__pyx_v_rho);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_state_vec, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_basis, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -21965,6 +23347,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_coo_matrix, __pyx_k_coo_matrix, sizeof(__pyx_k_coo_matrix), 0, 0, 1, 1},
   {&__pyx_n_s_cy_lut, __pyx_k_cy_lut, sizeof(__pyx_k_cy_lut), 0, 0, 1, 1},
   {&__pyx_n_s_data_type, __pyx_k_data_type, sizeof(__pyx_k_data_type), 0, 0, 1, 1},
+  {&__pyx_n_s_density_matrix, __pyx_k_density_matrix, sizeof(__pyx_k_density_matrix), 0, 0, 1, 1},
+  {&__pyx_n_s_density_matrix_two, __pyx_k_density_matrix_two, sizeof(__pyx_k_density_matrix_two), 0, 0, 1, 1},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
@@ -22028,11 +23412,13 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
+  {&__pyx_n_s_rho, __pyx_k_rho, sizeof(__pyx_k_rho), 0, 0, 1, 1},
   {&__pyx_n_s_row, __pyx_k_row, sizeof(__pyx_k_row), 0, 0, 1, 1},
   {&__pyx_n_s_scipy_sparse, __pyx_k_scipy_sparse, sizeof(__pyx_k_scipy_sparse), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
+  {&__pyx_n_s_sig, __pyx_k_sig, sizeof(__pyx_k_sig), 0, 0, 1, 1},
   {&__pyx_n_s_sig1, __pyx_k_sig1, sizeof(__pyx_k_sig1), 0, 0, 1, 1},
   {&__pyx_n_s_sig2, __pyx_k_sig2, sizeof(__pyx_k_sig2), 0, 0, 1, 1},
   {&__pyx_n_s_site_indices, __pyx_k_site_indices, sizeof(__pyx_k_site_indices), 0, 0, 1, 1},
@@ -22054,6 +23440,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_state, __pyx_k_state, sizeof(__pyx_k_state), 0, 0, 1, 1},
   {&__pyx_n_s_state_np, __pyx_k_state_np, sizeof(__pyx_k_state_np), 0, 0, 1, 1},
+  {&__pyx_n_s_state_vec, __pyx_k_state_vec, sizeof(__pyx_k_state_vec), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
   {&__pyx_n_s_stop, __pyx_k_stop, sizeof(__pyx_k_stop), 0, 0, 1, 1},
   {&__pyx_kp_s_strided_and_direct, __pyx_k_strided_and_direct, sizeof(__pyx_k_strided_and_direct), 0, 0, 1, 0},
@@ -22074,9 +23461,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 19, __pyx_L1_error)
-  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 82, __pyx_L1_error)
-  __pyx_builtin_map = __Pyx_GetBuiltinName(__pyx_n_s_map); if (!__pyx_builtin_map) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 81, __pyx_L1_error)
+  __pyx_builtin_map = __Pyx_GetBuiltinName(__pyx_n_s_map); if (!__pyx_builtin_map) __PYX_ERR(0, 81, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 229, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 810, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(1, 1000, __pyx_L1_error)
@@ -22417,41 +23804,65 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__30);
   __Pyx_GIVEREF(__pyx_tuple__30);
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":63
+  /* "pyqhe/cython/hamiltonian_cy.pyx":62
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def linear(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.uint32_t [:,:] spin_indices, np.float64_t [:,:,:,:] coeff, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
  *     """
  *     Computes a Hamiltonian of the form
  */
-  __pyx_tuple__31 = PyTuple_Pack(28, __pyx_n_s_basis, __pyx_n_s_site_indices, __pyx_n_s_spin_indices, __pyx_n_s_coeff, __pyx_n_s_Ldwn, __pyx_n_s_Nstates, __pyx_n_s_L, __pyx_n_s_Nsite_idx, __pyx_n_s_Nspin_idx, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_f1, __pyx_n_s_f2, __pyx_n_s_idx, __pyx_n_s_st0, __pyx_n_s_st1, __pyx_n_s_sp0, __pyx_n_s_sp1, __pyx_n_s_lut, __pyx_n_s_cy_lut, __pyx_n_s_state_np, __pyx_n_s_sp_np, __pyx_n_s_state, __pyx_n_s_sp, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_val); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_tuple__31 = PyTuple_Pack(28, __pyx_n_s_basis, __pyx_n_s_site_indices, __pyx_n_s_spin_indices, __pyx_n_s_coeff, __pyx_n_s_Ldwn, __pyx_n_s_Nstates, __pyx_n_s_L, __pyx_n_s_Nsite_idx, __pyx_n_s_Nspin_idx, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_f1, __pyx_n_s_f2, __pyx_n_s_idx, __pyx_n_s_st0, __pyx_n_s_st1, __pyx_n_s_sp0, __pyx_n_s_sp1, __pyx_n_s_lut, __pyx_n_s_cy_lut, __pyx_n_s_state_np, __pyx_n_s_sp_np, __pyx_n_s_state, __pyx_n_s_sp, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_val); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__31);
   __Pyx_GIVEREF(__pyx_tuple__31);
-  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(5, 0, 28, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyqhe_cython_hamiltonian_cy_pyx, __pyx_n_s_linear, 63, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(5, 0, 28, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyqhe_cython_hamiltonian_cy_pyx, __pyx_n_s_linear, 62, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 62, __pyx_L1_error)
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":119
+  /* "pyqhe/cython/hamiltonian_cy.pyx":118
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def quadratic(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.uint32_t [:,:] spin_indices,\             # <<<<<<<<<<<<<<
  *               np.float64_t [:,:,:,:] coeff_site,  np.float64_t [:,:,:,:] coeff_spin, np.uint32_t Ldwn):
  *     """
  */
-  __pyx_tuple__33 = PyTuple_Pack(35, __pyx_n_s_basis, __pyx_n_s_site_indices, __pyx_n_s_spin_indices, __pyx_n_s_coeff_site, __pyx_n_s_coeff_spin, __pyx_n_s_Ldwn, __pyx_n_s_Nstates, __pyx_n_s_L, __pyx_n_s_Nsite_idx, __pyx_n_s_Nspin_idx, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_f1, __pyx_n_s_f2, __pyx_n_s_f3, __pyx_n_s_f4, __pyx_n_s_idx, __pyx_n_s_st0, __pyx_n_s_st1, __pyx_n_s_st2, __pyx_n_s_st3, __pyx_n_s_sp0, __pyx_n_s_sp1, __pyx_n_s_sp2, __pyx_n_s_sp3, __pyx_n_s_lut, __pyx_n_s_cy_lut, __pyx_n_s_state_np, __pyx_n_s_sp_np, __pyx_n_s_state, __pyx_n_s_sp, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_val); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_tuple__33 = PyTuple_Pack(35, __pyx_n_s_basis, __pyx_n_s_site_indices, __pyx_n_s_spin_indices, __pyx_n_s_coeff_site, __pyx_n_s_coeff_spin, __pyx_n_s_Ldwn, __pyx_n_s_Nstates, __pyx_n_s_L, __pyx_n_s_Nsite_idx, __pyx_n_s_Nspin_idx, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_f1, __pyx_n_s_f2, __pyx_n_s_f3, __pyx_n_s_f4, __pyx_n_s_idx, __pyx_n_s_st0, __pyx_n_s_st1, __pyx_n_s_st2, __pyx_n_s_st3, __pyx_n_s_sp0, __pyx_n_s_sp1, __pyx_n_s_sp2, __pyx_n_s_sp3, __pyx_n_s_lut, __pyx_n_s_cy_lut, __pyx_n_s_state_np, __pyx_n_s_sp_np, __pyx_n_s_state, __pyx_n_s_sp, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_val); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__33);
   __Pyx_GIVEREF(__pyx_tuple__33);
-  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(6, 0, 35, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyqhe_cython_hamiltonian_cy_pyx, __pyx_n_s_quadratic, 119, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(6, 0, 35, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyqhe_cython_hamiltonian_cy_pyx, __pyx_n_s_quadratic, 118, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 118, __pyx_L1_error)
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":185
+  /* "pyqhe/cython/hamiltonian_cy.pyx":184
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def quadratic_delta(data_type_t [:,:] basis, np.float64_t [:,:,:,:] coeff, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
  *     """
  *     Computes a Hamiltonian of the special form
  */
-  __pyx_tuple__35 = PyTuple_Pack(28, __pyx_n_s_basis, __pyx_n_s_coeff, __pyx_n_s_Ldwn, __pyx_n_s_Nstates, __pyx_n_s_L, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_l, __pyx_n_s_m, __pyx_n_s_f1, __pyx_n_s_f2, __pyx_n_s_f3, __pyx_n_s_f4, __pyx_n_s_idx, __pyx_n_s_lut, __pyx_n_s_cy_lut, __pyx_n_s_state_np, __pyx_n_s_sp_np, __pyx_n_s_spp_np, __pyx_n_s_state, __pyx_n_s_sp, __pyx_n_s_spp, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_val, __pyx_n_s_sig1, __pyx_n_s_sig2); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_tuple__35 = PyTuple_Pack(28, __pyx_n_s_basis, __pyx_n_s_coeff, __pyx_n_s_Ldwn, __pyx_n_s_Nstates, __pyx_n_s_L, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_l, __pyx_n_s_m, __pyx_n_s_f1, __pyx_n_s_f2, __pyx_n_s_f3, __pyx_n_s_f4, __pyx_n_s_idx, __pyx_n_s_lut, __pyx_n_s_cy_lut, __pyx_n_s_state_np, __pyx_n_s_sp_np, __pyx_n_s_spp_np, __pyx_n_s_state, __pyx_n_s_sp, __pyx_n_s_spp, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_val, __pyx_n_s_sig1, __pyx_n_s_sig2); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 184, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__35);
   __Pyx_GIVEREF(__pyx_tuple__35);
-  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(3, 0, 28, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyqhe_cython_hamiltonian_cy_pyx, __pyx_n_s_quadratic_delta, 185, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(3, 0, 28, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyqhe_cython_hamiltonian_cy_pyx, __pyx_n_s_quadratic_delta, 184, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 184, __pyx_L1_error)
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":248
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * @cython.wraparound(False)  # turn off negative index wrapping for entire function
+ * def density_matrix(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t sig, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
+ *     """
+ *     Computes the density matrix \rho_ij^(spin1, spin2)
+ */
+  __pyx_tuple__37 = PyTuple_Pack(25, __pyx_n_s_state_vec, __pyx_n_s_basis, __pyx_n_s_sig, __pyx_n_s_Ldwn, __pyx_n_s_Nstates, __pyx_n_s_L, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_l, __pyx_n_s_m, __pyx_n_s_f1, __pyx_n_s_f2, __pyx_n_s_f3, __pyx_n_s_f4, __pyx_n_s_idx, __pyx_n_s_lut, __pyx_n_s_cy_lut, __pyx_n_s_state_np, __pyx_n_s_sp_np, __pyx_n_s_spp_np, __pyx_n_s_state, __pyx_n_s_sp, __pyx_n_s_spp, __pyx_n_s_rho); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__37);
+  __Pyx_GIVEREF(__pyx_tuple__37);
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(4, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyqhe_cython_hamiltonian_cy_pyx, __pyx_n_s_density_matrix, 248, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 248, __pyx_L1_error)
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":293
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * @cython.wraparound(False)  # turn off negative index wrapping for entire function
+ * def density_matrix_two(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t sig1, np.int32_t sig2, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
+ *     """
+ *     Computes the density matrix \rho_ijkl^(spin1, spin2)
+ */
+  __pyx_tuple__39 = PyTuple_Pack(26, __pyx_n_s_state_vec, __pyx_n_s_basis, __pyx_n_s_sig1, __pyx_n_s_sig2, __pyx_n_s_Ldwn, __pyx_n_s_Nstates, __pyx_n_s_L, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_l, __pyx_n_s_m, __pyx_n_s_f1, __pyx_n_s_f2, __pyx_n_s_f3, __pyx_n_s_f4, __pyx_n_s_idx, __pyx_n_s_lut, __pyx_n_s_cy_lut, __pyx_n_s_state_np, __pyx_n_s_sp_np, __pyx_n_s_spp_np, __pyx_n_s_state, __pyx_n_s_sp, __pyx_n_s_spp, __pyx_n_s_rho); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 293, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__39);
+  __Pyx_GIVEREF(__pyx_tuple__39);
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(5, 0, 26, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyqhe_cython_hamiltonian_cy_pyx, __pyx_n_s_density_matrix_two, 293, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 293, __pyx_L1_error)
 
   /* "View.MemoryView":285
  *         return self.name
@@ -22460,9 +23871,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(2, 285, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__37);
-  __Pyx_GIVEREF(__pyx_tuple__37);
+  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(2, 285, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__41);
+  __Pyx_GIVEREF(__pyx_tuple__41);
 
   /* "View.MemoryView":286
  * 
@@ -22471,9 +23882,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__38 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(2, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__38);
-  __Pyx_GIVEREF(__pyx_tuple__38);
+  __pyx_tuple__42 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(2, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__42);
+  __Pyx_GIVEREF(__pyx_tuple__42);
 
   /* "View.MemoryView":287
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -22482,9 +23893,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(2, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__39);
-  __Pyx_GIVEREF(__pyx_tuple__39);
+  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(2, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__43);
+  __Pyx_GIVEREF(__pyx_tuple__43);
 
   /* "View.MemoryView":290
  * 
@@ -22493,9 +23904,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__40 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(2, 290, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__40);
-  __Pyx_GIVEREF(__pyx_tuple__40);
+  __pyx_tuple__44 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(2, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__44);
+  __Pyx_GIVEREF(__pyx_tuple__44);
 
   /* "View.MemoryView":291
  * 
@@ -22504,19 +23915,19 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(2, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__41);
-  __Pyx_GIVEREF(__pyx_tuple__41);
+  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(2, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__45);
+  __Pyx_GIVEREF(__pyx_tuple__45);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Enum(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     if __pyx_checksum != 0xb068931:
  *         from pickle import PickleError as __pyx_PickleError
  */
-  __pyx_tuple__42 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(2, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__42);
-  __Pyx_GIVEREF(__pyx_tuple__42);
-  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(2, 1, __pyx_L1_error)
+  __pyx_tuple__46 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(2, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__46);
+  __Pyx_GIVEREF(__pyx_tuple__46);
+  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(2, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -22856,7 +24267,7 @@ if (!__Pyx_RefNanny) {
  * 
  * from scipy.sparse import coo_matrix             # <<<<<<<<<<<<<<
  * from libcpp.vector cimport vector
- * from libcpp cimport bool
+ * 
  */
   __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -22872,55 +24283,79 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":12
- * from libcpp.utility cimport pair
+  /* "pyqhe/cython/hamiltonian_cy.pyx":9
+ * from libcpp.vector cimport vector
  * 
  * data_type = np.uint8             # <<<<<<<<<<<<<<
  * ctypedef np.uint8_t data_type_t
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_uint8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_uint8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_data_type, __pyx_t_1) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_data_type, __pyx_t_1) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":63
+  /* "pyqhe/cython/hamiltonian_cy.pyx":62
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def linear(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.uint32_t [:,:] spin_indices, np.float64_t [:,:,:,:] coeff, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
  *     """
  *     Computes a Hamiltonian of the form
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_7linear, NULL, __pyx_n_s_pyqhe_cython_hamiltonian_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_7linear, NULL, __pyx_n_s_pyqhe_cython_hamiltonian_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_linear, __pyx_t_1) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_linear, __pyx_t_1) < 0) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":119
+  /* "pyqhe/cython/hamiltonian_cy.pyx":118
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def quadratic(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.uint32_t [:,:] spin_indices,\             # <<<<<<<<<<<<<<
  *               np.float64_t [:,:,:,:] coeff_site,  np.float64_t [:,:,:,:] coeff_spin, np.uint32_t Ldwn):
  *     """
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_9quadratic, NULL, __pyx_n_s_pyqhe_cython_hamiltonian_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_9quadratic, NULL, __pyx_n_s_pyqhe_cython_hamiltonian_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_quadratic, __pyx_t_1) < 0) __PYX_ERR(0, 119, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_quadratic, __pyx_t_1) < 0) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pyqhe/cython/hamiltonian_cy.pyx":185
+  /* "pyqhe/cython/hamiltonian_cy.pyx":184
  * @cython.boundscheck(False) # turn off bounds-checking for entire function
  * @cython.wraparound(False)  # turn off negative index wrapping for entire function
  * def quadratic_delta(data_type_t [:,:] basis, np.float64_t [:,:,:,:] coeff, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
  *     """
  *     Computes a Hamiltonian of the special form
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_11quadratic_delta, NULL, __pyx_n_s_pyqhe_cython_hamiltonian_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_11quadratic_delta, NULL, __pyx_n_s_pyqhe_cython_hamiltonian_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 184, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_quadratic_delta, __pyx_t_1) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_quadratic_delta, __pyx_t_1) < 0) __PYX_ERR(0, 184, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":248
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * @cython.wraparound(False)  # turn off negative index wrapping for entire function
+ * def density_matrix(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t sig, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
+ *     """
+ *     Computes the density matrix \rho_ij^(spin1, spin2)
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_13density_matrix, NULL, __pyx_n_s_pyqhe_cython_hamiltonian_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_density_matrix, __pyx_t_1) < 0) __PYX_ERR(0, 248, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "pyqhe/cython/hamiltonian_cy.pyx":293
+ * @cython.boundscheck(False) # turn off bounds-checking for entire function
+ * @cython.wraparound(False)  # turn off negative index wrapping for entire function
+ * def density_matrix_two(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t sig1, np.int32_t sig2, np.uint32_t Ldwn):             # <<<<<<<<<<<<<<
+ *     """
+ *     Computes the density matrix \rho_ijkl^(spin1, spin2)
+ */
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5pyqhe_6cython_14hamiltonian_cy_15density_matrix_two, NULL, __pyx_n_s_pyqhe_cython_hamiltonian_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 293, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_density_matrix_two, __pyx_t_1) < 0) __PYX_ERR(0, 293, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "pyqhe/cython/hamiltonian_cy.pyx":1
@@ -22953,7 +24388,7 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__37, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 285, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__41, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_1);
@@ -22967,7 +24402,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__38, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 286, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__42, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_1);
@@ -22981,7 +24416,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__39, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 287, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__43, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_1);
@@ -22995,7 +24430,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__40, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 290, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__44, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_1);
@@ -23009,7 +24444,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__41, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 291, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__45, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_1);
@@ -23711,6 +25146,122 @@ static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
 }
 #endif
 
+/* GetItemInt */
+    static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
+    PyObject *r;
+    if (!j) return NULL;
+    r = PyObject_GetItem(o, j);
+    Py_DECREF(j);
+    return r;
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    Py_ssize_t wrapped_i = i;
+    if (wraparound & unlikely(i < 0)) {
+        wrapped_i += PyList_GET_SIZE(o);
+    }
+    if ((!boundscheck) || likely((0 <= wrapped_i) & (wrapped_i < PyList_GET_SIZE(o)))) {
+        PyObject *r = PyList_GET_ITEM(o, wrapped_i);
+        Py_INCREF(r);
+        return r;
+    }
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    Py_ssize_t wrapped_i = i;
+    if (wraparound & unlikely(i < 0)) {
+        wrapped_i += PyTuple_GET_SIZE(o);
+    }
+    if ((!boundscheck) || likely((0 <= wrapped_i) & (wrapped_i < PyTuple_GET_SIZE(o)))) {
+        PyObject *r = PyTuple_GET_ITEM(o, wrapped_i);
+        Py_INCREF(r);
+        return r;
+    }
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
+                                                     CYTHON_NCP_UNUSED int wraparound,
+                                                     CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS && CYTHON_USE_TYPE_SLOTS
+    if (is_list || PyList_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
+        if ((!boundscheck) || (likely((n >= 0) & (n < PyList_GET_SIZE(o))))) {
+            PyObject *r = PyList_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    }
+    else if (PyTuple_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
+        if ((!boundscheck) || likely((n >= 0) & (n < PyTuple_GET_SIZE(o)))) {
+            PyObject *r = PyTuple_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    } else {
+        PySequenceMethods *m = Py_TYPE(o)->tp_as_sequence;
+        if (likely(m && m->sq_item)) {
+            if (wraparound && unlikely(i < 0) && likely(m->sq_length)) {
+                Py_ssize_t l = m->sq_length(o);
+                if (likely(l >= 0)) {
+                    i += l;
+                } else {
+                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
+                        return NULL;
+                    PyErr_Clear();
+                }
+            }
+            return m->sq_item(o, i);
+        }
+    }
+#else
+    if (is_list || PySequence_Check(o)) {
+        return PySequence_GetItem(o, i);
+    }
+#endif
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+}
+
+/* ObjectGetItem */
+    #if CYTHON_USE_TYPE_SLOTS
+static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject* index) {
+    PyObject *runerr;
+    Py_ssize_t key_value;
+    PySequenceMethods *m = Py_TYPE(obj)->tp_as_sequence;
+    if (unlikely(!(m && m->sq_item))) {
+        PyErr_Format(PyExc_TypeError, "'%.200s' object is not subscriptable", Py_TYPE(obj)->tp_name);
+        return NULL;
+    }
+    key_value = __Pyx_PyIndex_AsSsize_t(index);
+    if (likely(key_value != -1 || !(runerr = PyErr_Occurred()))) {
+        return __Pyx_GetItemInt_Fast(obj, key_value, 0, 1, 1);
+    }
+    if (PyErr_GivenExceptionMatches(runerr, PyExc_OverflowError)) {
+        PyErr_Clear();
+        PyErr_Format(PyExc_IndexError, "cannot fit '%.200s' into an index-sized integer", Py_TYPE(index)->tp_name);
+    }
+    return NULL;
+}
+static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key) {
+    PyMappingMethods *m = Py_TYPE(obj)->tp_as_mapping;
+    if (likely(m && m->mp_subscript)) {
+        return m->mp_subscript(obj, key);
+    }
+    return __Pyx_PyObject_GetIndex(obj, key);
+}
+#endif
+
 /* PyErrFetchRestore */
     #if CYTHON_FAST_THREAD_STATE
 static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
@@ -24246,122 +25797,6 @@ return_ne:
 #endif
     return PyObject_GetAttr(o, n);
 }
-
-/* GetItemInt */
-      static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
-    PyObject *r;
-    if (!j) return NULL;
-    r = PyObject_GetItem(o, j);
-    Py_DECREF(j);
-    return r;
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              CYTHON_NCP_UNUSED int wraparound,
-                                                              CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    Py_ssize_t wrapped_i = i;
-    if (wraparound & unlikely(i < 0)) {
-        wrapped_i += PyList_GET_SIZE(o);
-    }
-    if ((!boundscheck) || likely((0 <= wrapped_i) & (wrapped_i < PyList_GET_SIZE(o)))) {
-        PyObject *r = PyList_GET_ITEM(o, wrapped_i);
-        Py_INCREF(r);
-        return r;
-    }
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-#else
-    return PySequence_GetItem(o, i);
-#endif
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              CYTHON_NCP_UNUSED int wraparound,
-                                                              CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    Py_ssize_t wrapped_i = i;
-    if (wraparound & unlikely(i < 0)) {
-        wrapped_i += PyTuple_GET_SIZE(o);
-    }
-    if ((!boundscheck) || likely((0 <= wrapped_i) & (wrapped_i < PyTuple_GET_SIZE(o)))) {
-        PyObject *r = PyTuple_GET_ITEM(o, wrapped_i);
-        Py_INCREF(r);
-        return r;
-    }
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-#else
-    return PySequence_GetItem(o, i);
-#endif
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
-                                                     CYTHON_NCP_UNUSED int wraparound,
-                                                     CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS && CYTHON_USE_TYPE_SLOTS
-    if (is_list || PyList_CheckExact(o)) {
-        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
-        if ((!boundscheck) || (likely((n >= 0) & (n < PyList_GET_SIZE(o))))) {
-            PyObject *r = PyList_GET_ITEM(o, n);
-            Py_INCREF(r);
-            return r;
-        }
-    }
-    else if (PyTuple_CheckExact(o)) {
-        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
-        if ((!boundscheck) || likely((n >= 0) & (n < PyTuple_GET_SIZE(o)))) {
-            PyObject *r = PyTuple_GET_ITEM(o, n);
-            Py_INCREF(r);
-            return r;
-        }
-    } else {
-        PySequenceMethods *m = Py_TYPE(o)->tp_as_sequence;
-        if (likely(m && m->sq_item)) {
-            if (wraparound && unlikely(i < 0) && likely(m->sq_length)) {
-                Py_ssize_t l = m->sq_length(o);
-                if (likely(l >= 0)) {
-                    i += l;
-                } else {
-                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
-                        return NULL;
-                    PyErr_Clear();
-                }
-            }
-            return m->sq_item(o, i);
-        }
-    }
-#else
-    if (is_list || PySequence_Check(o)) {
-        return PySequence_GetItem(o, i);
-    }
-#endif
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-}
-
-/* ObjectGetItem */
-      #if CYTHON_USE_TYPE_SLOTS
-static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject* index) {
-    PyObject *runerr;
-    Py_ssize_t key_value;
-    PySequenceMethods *m = Py_TYPE(obj)->tp_as_sequence;
-    if (unlikely(!(m && m->sq_item))) {
-        PyErr_Format(PyExc_TypeError, "'%.200s' object is not subscriptable", Py_TYPE(obj)->tp_name);
-        return NULL;
-    }
-    key_value = __Pyx_PyIndex_AsSsize_t(index);
-    if (likely(key_value != -1 || !(runerr = PyErr_Occurred()))) {
-        return __Pyx_GetItemInt_Fast(obj, key_value, 0, 1, 1);
-    }
-    if (PyErr_GivenExceptionMatches(runerr, PyExc_OverflowError)) {
-        PyErr_Clear();
-        PyErr_Format(PyExc_IndexError, "cannot fit '%.200s' into an index-sized integer", Py_TYPE(index)->tp_name);
-    }
-    return NULL;
-}
-static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key) {
-    PyMappingMethods *m = Py_TYPE(obj)->tp_as_mapping;
-    if (likely(m && m->mp_subscript)) {
-        return m->mp_subscript(obj, key);
-    }
-    return __Pyx_PyObject_GetIndex(obj, key);
-}
-#endif
 
 /* decode_c_string */
       static CYTHON_INLINE PyObject* __Pyx_decode_c_string(
@@ -26077,6 +27512,29 @@ __pyx_fail:
     return result;
 }
 
+/* ObjectToMemviewSlice */
+        static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_nn___pyx_t_5numpy_float64_t(PyObject *obj, int writable_flag) {
+    __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
+    __Pyx_BufFmt_StackElem stack[1];
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int retcode;
+    if (obj == Py_None) {
+        result.memview = (struct __pyx_memoryview_obj *) Py_None;
+        return result;
+    }
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
+                                                 PyBUF_RECORDS_RO | writable_flag, 1,
+                                                 &__Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t, stack,
+                                                 &result, obj);
+    if (unlikely(retcode == -1))
+        goto __pyx_fail;
+    return result;
+__pyx_fail:
+    result.memview = NULL;
+    result.data = NULL;
+    return result;
+}
+
 /* CIntToPy */
         static CYTHON_INLINE PyObject* __Pyx_PyInt_From_npy_uint32(npy_uint32 value) {
     const npy_uint32 neg_one = (npy_uint32) -1, const_zero = (npy_uint32) 0;
@@ -27020,6 +28478,195 @@ raise_neg_overflow:
     PyErr_SetString(PyExc_OverflowError,
         "can't convert negative value to int");
     return (int) -1;
+}
+
+/* CIntFromPy */
+        static CYTHON_INLINE npy_int32 __Pyx_PyInt_As_npy_int32(PyObject *x) {
+    const npy_int32 neg_one = (npy_int32) -1, const_zero = (npy_int32) 0;
+    const int is_unsigned = neg_one > const_zero;
+#if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_Check(x))) {
+        if (sizeof(npy_int32) < sizeof(long)) {
+            __PYX_VERIFY_RETURN_INT(npy_int32, long, PyInt_AS_LONG(x))
+        } else {
+            long val = PyInt_AS_LONG(x);
+            if (is_unsigned && unlikely(val < 0)) {
+                goto raise_neg_overflow;
+            }
+            return (npy_int32) val;
+        }
+    } else
+#endif
+    if (likely(PyLong_Check(x))) {
+        if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+            const digit* digits = ((PyLongObject*)x)->ob_digit;
+            switch (Py_SIZE(x)) {
+                case  0: return (npy_int32) 0;
+                case  1: __PYX_VERIFY_RETURN_INT(npy_int32, digit, digits[0])
+                case 2:
+                    if (8 * sizeof(npy_int32) > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) >= 2 * PyLong_SHIFT) {
+                            return (npy_int32) (((((npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0]));
+                        }
+                    }
+                    break;
+                case 3:
+                    if (8 * sizeof(npy_int32) > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) >= 3 * PyLong_SHIFT) {
+                            return (npy_int32) (((((((npy_int32)digits[2]) << PyLong_SHIFT) | (npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0]));
+                        }
+                    }
+                    break;
+                case 4:
+                    if (8 * sizeof(npy_int32) > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) >= 4 * PyLong_SHIFT) {
+                            return (npy_int32) (((((((((npy_int32)digits[3]) << PyLong_SHIFT) | (npy_int32)digits[2]) << PyLong_SHIFT) | (npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0]));
+                        }
+                    }
+                    break;
+            }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON
+            if (unlikely(Py_SIZE(x) < 0)) {
+                goto raise_neg_overflow;
+            }
+#else
+            {
+                int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+                if (unlikely(result < 0))
+                    return (npy_int32) -1;
+                if (unlikely(result == 1))
+                    goto raise_neg_overflow;
+            }
+#endif
+            if (sizeof(npy_int32) <= sizeof(unsigned long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(npy_int32, unsigned long, PyLong_AsUnsignedLong(x))
+#ifdef HAVE_LONG_LONG
+            } else if (sizeof(npy_int32) <= sizeof(unsigned PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(npy_int32, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+#endif
+            }
+        } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+            const digit* digits = ((PyLongObject*)x)->ob_digit;
+            switch (Py_SIZE(x)) {
+                case  0: return (npy_int32) 0;
+                case -1: __PYX_VERIFY_RETURN_INT(npy_int32, sdigit, (sdigit) (-(sdigit)digits[0]))
+                case  1: __PYX_VERIFY_RETURN_INT(npy_int32,  digit, +digits[0])
+                case -2:
+                    if (8 * sizeof(npy_int32) - 1 > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) - 1 > 2 * PyLong_SHIFT) {
+                            return (npy_int32) (((npy_int32)-1)*(((((npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0])));
+                        }
+                    }
+                    break;
+                case 2:
+                    if (8 * sizeof(npy_int32) > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) - 1 > 2 * PyLong_SHIFT) {
+                            return (npy_int32) ((((((npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0])));
+                        }
+                    }
+                    break;
+                case -3:
+                    if (8 * sizeof(npy_int32) - 1 > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) - 1 > 3 * PyLong_SHIFT) {
+                            return (npy_int32) (((npy_int32)-1)*(((((((npy_int32)digits[2]) << PyLong_SHIFT) | (npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0])));
+                        }
+                    }
+                    break;
+                case 3:
+                    if (8 * sizeof(npy_int32) > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) - 1 > 3 * PyLong_SHIFT) {
+                            return (npy_int32) ((((((((npy_int32)digits[2]) << PyLong_SHIFT) | (npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0])));
+                        }
+                    }
+                    break;
+                case -4:
+                    if (8 * sizeof(npy_int32) - 1 > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) - 1 > 4 * PyLong_SHIFT) {
+                            return (npy_int32) (((npy_int32)-1)*(((((((((npy_int32)digits[3]) << PyLong_SHIFT) | (npy_int32)digits[2]) << PyLong_SHIFT) | (npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0])));
+                        }
+                    }
+                    break;
+                case 4:
+                    if (8 * sizeof(npy_int32) > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(npy_int32, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(npy_int32) - 1 > 4 * PyLong_SHIFT) {
+                            return (npy_int32) ((((((((((npy_int32)digits[3]) << PyLong_SHIFT) | (npy_int32)digits[2]) << PyLong_SHIFT) | (npy_int32)digits[1]) << PyLong_SHIFT) | (npy_int32)digits[0])));
+                        }
+                    }
+                    break;
+            }
+#endif
+            if (sizeof(npy_int32) <= sizeof(long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(npy_int32, long, PyLong_AsLong(x))
+#ifdef HAVE_LONG_LONG
+            } else if (sizeof(npy_int32) <= sizeof(PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(npy_int32, PY_LONG_LONG, PyLong_AsLongLong(x))
+#endif
+            }
+        }
+        {
+#if CYTHON_COMPILING_IN_PYPY && !defined(_PyLong_AsByteArray)
+            PyErr_SetString(PyExc_RuntimeError,
+                            "_PyLong_AsByteArray() not available in PyPy, cannot convert large numbers");
+#else
+            npy_int32 val;
+            PyObject *v = __Pyx_PyNumber_IntOrLong(x);
+ #if PY_MAJOR_VERSION < 3
+            if (likely(v) && !PyLong_Check(v)) {
+                PyObject *tmp = v;
+                v = PyNumber_Long(tmp);
+                Py_DECREF(tmp);
+            }
+ #endif
+            if (likely(v)) {
+                int one = 1; int is_little = (int)*(unsigned char *)&one;
+                unsigned char *bytes = (unsigned char *)&val;
+                int ret = _PyLong_AsByteArray((PyLongObject *)v,
+                                              bytes, sizeof(val),
+                                              is_little, !is_unsigned);
+                Py_DECREF(v);
+                if (likely(!ret))
+                    return val;
+            }
+#endif
+            return (npy_int32) -1;
+        }
+    } else {
+        npy_int32 val;
+        PyObject *tmp = __Pyx_PyNumber_IntOrLong(x);
+        if (!tmp) return (npy_int32) -1;
+        val = __Pyx_PyInt_As_npy_int32(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to npy_int32");
+    return (npy_int32) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to npy_int32");
+    return (npy_int32) -1;
 }
 
 /* CIntFromPy */

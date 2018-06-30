@@ -5,7 +5,7 @@ from itertools import product
 from math import sqrt, factorial
 from pyqhe.basis import BasisFermi
 from pyqhe.hamiltonian import OperatorLinCy, OperatorQuadDeltaCy, Solve
-from pyqhe.util import hinton_fast
+from pyqhe.plotting import hinton_fast
 
 basis = BasisFermi(N=[2,2], m=[8,8])
 #basis.print_states()

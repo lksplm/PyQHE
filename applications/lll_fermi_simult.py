@@ -7,7 +7,7 @@ from itertools import product
 from math import sqrt, factorial
 from pyqhe.basis import BasisFermi
 from pyqhe.hamiltonian import OperatorLinCy, OperatorQuadCy, OperatorQuadDeltaCy
-from pyqhe.util import hinton_fast
+from pyqhe.plotting import hinton_fast
 from pyqhe.eigensystem import Eigensystem, Observable
 import pickle
 
