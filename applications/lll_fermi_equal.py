@@ -30,7 +30,8 @@ for j, k, l, m in int_sites:
 Hint = OperatorQuadDeltaCy(basis, coeff=coeff)
 print("Hint hermitian: ",Hint.is_hermitian())
 
-Hinteq = OperatorQuadCy(basis, site_indices=int_sites, spin_indices=[()])
+Hinteq = OperatorQuadCy(basis, site_indices=int_sites, spin_indices=[(0,0),(1,1)], \
+                        op_func_site=coeff, op_func_spin=1.)
 
 
 p_sites = [(i,i+2) for i in range(basis.m[0]-2)]+[(i+2,i) for i in range(basis.m[0]-2)]
@@ -43,8 +44,8 @@ print("Starting diagonalisation...", flush=True)
 
 alpha = np.linspace(np.finfo(float).eps, 0.5, 100)
 eps = np.linspace(np.finfo(float).eps, 0.1, 100)
-eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.25], eps], M=10)
-#eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=10)
+#eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.25], eps], M=10)
+eigsys = Eigensystem(ops_list=[H0, Hint, Hinteq], param_list=[alpha, [0.25], [0.025]], M=10)
 
 #energies, states = eigsys.energies, eigsys.states
 
@@ -66,7 +67,7 @@ eigsys.add_observable(name="S", op=S)
 L = eigsys.get_observable("L") #np.empty((self.M, *self.param_shape))
 Eint = eigsys.get_observable("Eint")
 
-"""
+
 _, ax = eigsys.plot_observable("E")
 ax.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
 ax.set_xlabel(r'$\alpha$')
@@ -97,3 +98,4 @@ plt.show()
 """
 savedict = {'states': basis.states, 'Ltot': L, 'GndSts': eigsys.states, 'Esys': eigsys}
 pickle.dump(savedict,open("results/result_pert_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), "wb" ))
+"""

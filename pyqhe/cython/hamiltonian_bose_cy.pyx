@@ -5,7 +5,7 @@ cimport cython
 
 from scipy.sparse import coo_matrix
 from libcpp.vector cimport vector
-
+from libc.math cimport sqrt
 data_type = np.uint8
 ctypedef np.uint8_t data_type_t
 
@@ -72,7 +72,7 @@ def linear(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices, np.float64_t
                 idx = cy_lut[tuple(sp)]
                 row.push_back(i)
                 col.push_back(idx)
-                val.push_back(coeff[st0,st1]*np.sqrt(f1*f2))
+                val.push_back(coeff[st0,st1]*sqrt(f1*f2))
 
     return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))
 
@@ -129,7 +129,7 @@ def quadratic(data_type_t [:,:] basis, np.uint32_t [:,:] site_indices,\
                     idx = cy_lut[tuple(sp)]
                     row.push_back(i)
                     col.push_back(idx)
-                    val.push_back(coeff_site[st0,st1,st2,st3]*np.sqrt(f1*f2*f3*f4))
+                    val.push_back(coeff_site[st0,st1,st2,st3]*sqrt(f1*f2*f3*f4))
 
     return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))
 
@@ -185,7 +185,7 @@ def quadratic_delta(data_type_t [:,:] basis, np.float64_t [:,:,:,:] coeff):
                                 idx = cy_lut[tuple(spp)]
                                 row.push_back(i)
                                 col.push_back(idx)
-                                val.push_back(coeff[m,l,k,j]*np.sqrt(f1*f2*f3*f4))
+                                val.push_back(coeff[m,l,k,j]*sqrt(f1*f2*f3*f4))
 
     return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))
 
@@ -227,7 +227,7 @@ def density_matrix(np.float64_t [:] state_vec, data_type_t [:,:] basis):
                         #print('spp', l ,m, tuple(spp))
                         idx = cy_lut[tuple(spp)]
                         #print(i, idx)
-                        rho[k,j] += np.sqrt(f1*f3)*state_vec[i]*state_vec[idx]
+                        rho[k,j] += sqrt(f1*f3)*state_vec[i]*state_vec[idx]
 
     return rho
 
@@ -271,6 +271,6 @@ def density_matrix_two(np.float64_t [:] state_vec, data_type_t [:,:] basis):
                             f4 = b_dagger(spp, m)
                             if f3>0 and f4 >0:
                                 idx = cy_lut[tuple(spp)]
-                                rho[m,l,k,j] += f1*f2*f3*f4*state_vec[i]*state_vec[idx]
+                                rho[m,l,k,j] += sqrt(f1*f2*f3*f4)*state_vec[i]*state_vec[idx]
 
     return rho

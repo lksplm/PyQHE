@@ -9,7 +9,7 @@ from pyqhe.plotting import hinton_fast
 from pyqhe.eigensystem import Eigensystem
 import pickle
 
-N=6
+N=4
 basis = BasisBose(N=N, m=2*N)
 #basis.print_states()
 
@@ -36,10 +36,10 @@ Hp = Hp + H0
 print("Hp hermitian: ",Hp.is_hermitian())
 print("Starting diagonalisation...", flush=True)
 
-alpha = np.linspace(np.finfo(float).eps, 0.5, 100)
+alpha = np.linspace(np.finfo(float).eps, 0.3, 100)
 eps = np.linspace(np.finfo(float).eps, 0.03, 20)
 #eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.1], eps], M=10)
-eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.62832]], M=10)
+eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.1]], M=10)
 #eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.1], [0.01]], M=10)
 
 eigsys.add_observable(name="L", op=H0)
@@ -77,5 +77,5 @@ plt.ylabel(r"$\epsilon$")
 """
 plt.show()
 
-savedict = {'states': basis.states, 'Ltot': L, 'Esys': eigsys}
+savedict = {'states': basis.states, 'Esys': eigsys}
 pickle.dump(savedict,open("results/result_bose_{:d}_{:d}.p".format(basis.m, basis.N), "wb" ))
