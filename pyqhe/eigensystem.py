@@ -47,7 +47,9 @@ class Eigensystem:
             if simult_obs is not None: #Perform simultaneous diagonalization
                 H += 1j*simult_obs.op.matrix
                 if full:
-                    eige, eigs = np.linalg.eig(H.todense())
+                    eige_cmplx, eigs = np.linalg.eig(H.todense())
+                    eige = eige_cmplx.real
+                    simult_ev[(slice(None),) + j] = eige_cmplx.imag
                 else:
                     for i, sv in enumerate(simult_seed):
                         eige_cmplx, eigs = sp.linalg.eigs(H, k=Ms, which='LM', sigma=sv)

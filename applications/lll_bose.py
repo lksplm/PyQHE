@@ -36,11 +36,12 @@ Hp = Hp + H0
 print("Hp hermitian: ",Hp.is_hermitian())
 print("Starting diagonalisation...", flush=True)
 
-alpha = np.linspace(np.finfo(float).eps, 0.3, 100)
-eps = np.linspace(np.finfo(float).eps, 0.03, 20)
-#eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.1], eps], M=10)
-eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.1]], M=10)
+alpha = np.linspace(np.finfo(float).eps, 0.25, 100)
+eps = np.linspace(np.finfo(float).eps, 0.03, 100)
+eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.1], eps], M=10)
+#eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.1]], M=10)
 #eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.1], [0.01]], M=10)
+#eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [np.finfo(float).eps, 0.1], [0, 0.02]], full=True)
 
 eigsys.add_observable(name="L", op=H0)
 eigsys.add_observable(name="Eint", op=Hint)
@@ -49,7 +50,7 @@ E = np.squeeze(eigsys.get_observable("E"))
 L = eigsys.get_observable("L")
 Eint = eigsys.get_observable("Eint")
 
-
+"""
 _, ax = eigsys.plot_observable("E", Mshow=3)
 ax.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
 ax.set_xlabel(r'$\alpha$')
@@ -66,7 +67,7 @@ plt.legend()
 plt.xlabel('$L$')
 plt.ylabel('$E_{int}/U$')
 #plt.title('$N_{{\\uparrow={:d} }}, N_{{\\downarrow={:d} }}, m={:d}$'.format(N_up, N_dwn, L_dwn))
-"""
+
 plt.figure()
 #plt.pcolormesh(alpha, eps, -(E[1,:,:]-E[0,:,:]).T, cmap='jet')
 plt.imshow( -(E[1,:,:]-E[0,:,:]).T, cmap='jet', interpolation='bicubic', origin='lower')
@@ -78,4 +79,4 @@ plt.ylabel(r"$\epsilon$")
 plt.show()
 
 savedict = {'states': basis.states, 'Esys': eigsys}
-pickle.dump(savedict,open("results/result_bose_{:d}_{:d}.p".format(basis.m, basis.N), "wb" ))
+pickle.dump(savedict,open("results/result_bose_gap_{:d}_{:d}.p".format(basis.m, basis.N), "wb" ))

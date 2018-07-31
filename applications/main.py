@@ -9,7 +9,7 @@ from pyqhe.plotting import hinton_fast, spectrum_spin, energy_spin
 from pyqhe.eigensystem import Eigensystem, Observable
 import pickle
 
-basis = BasisFermi(N=[3,2], m=[10,10])
+basis = BasisFermi(N=[2,3], m=[8,8])
 
 diag_sites = [(i,i) for i in range(basis.m[0])]
 coeff_l = lambda i, j, s, p: i*(i==j)
@@ -50,7 +50,8 @@ alpha = np.linspace(np.finfo(float).eps, 0.5, 30)
 eps = np.linspace(np.finfo(float).eps, 0.1, 100)
 #eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.25], eps], M=10)
 #eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=100)
-eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=10, simult_obs=Sop, simult_seed=[0.75j, 3.75j]) #
+#eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=10, simult_obs=Sop, simult_seed=[0.75j, 3.75j]) #
+eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], simult_obs=Sop, full=True) #
 
 eigsys.add_observable(name="L", op=H0)
 eigsys.add_observable(name="Eint", op=Hint)
@@ -58,7 +59,7 @@ eigsys.add_observable(name="Eint", op=Hint)
 #Modify spin
 Sz = 0.5*(basis.N[1]-basis.N[0])
 eigsys.Observables["S"].eigenvalues = -0.5+np.sqrt(0.25+(eigsys.Observables["S"].eigenvalues+Sz*(Sz+1)))
-
+"""
 L = eigsys.get_observable("L")
 Eall = eigsys.get_observable("E")
 Eint = eigsys.get_observable("Eint")
@@ -85,6 +86,6 @@ _, ax4 = spectrum_spin(L, Eint, Spin, integer=False)
 _, ax5 = energy_spin(alpha, L, Eall, Spin, integer=False)
 
 plt.show()
-
-#savedict = {'states': basis.states, 'Ltot': L, 'GndSts': eigsys.states, 'Esys': eigsys}
-#pickle.dump(savedict,open("results/result_pert_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), "wb" ))
+"""
+savedict = {'states': basis.states, 'Esys': eigsys}
+pickle.dump(savedict,open("results/result_imbal_full_{:d}_{:d}_{:d}_{:d}.p".format(*basis.N, *basis.m), "wb" ))

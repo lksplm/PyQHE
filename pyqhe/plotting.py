@@ -15,11 +15,14 @@ def format_spin(s):
     f = Fraction(int(s*2), 2)
     return "{:d}/{:d}".format(f.numerator, f.denominator)
 
-def energy_spin(alpha, L, E, S, Mshow=10, ax=None, integer=True):
+def energy_spin(alpha, E, S, Mshow=10, ax=None, integer=True, **kwargs):
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
     else:
         fig = None
+
+    S = np.squeeze(S)
+    E = np.squeeze(E)
 
     Splt = S.copy()
     Splt[np.isnan(Splt)] = -1
@@ -46,18 +49,18 @@ def energy_spin(alpha, L, E, S, Mshow=10, ax=None, integer=True):
                            enumerate(Slbl)]
 
     for i in range(Mshow):
-        e = E[i, :, 0]
-        s = Splt[i, :, 0]
+        e = E[i, :]
+        s = Splt[i, :]
         points = np.array([alpha, e]).T.reshape(-1, 1, 2)
         segments = np.concatenate([points[:-1], points[1:]], axis=1)
-        lc = LineCollection(segments, cmap=cmap, norm=norm)
+        lc = LineCollection(segments, cmap=cmap, norm=norm, **kwargs)
         lc.set_array(s)
-        lc.set_linewidth(1.0)
+        #lc.set_linewidth(1.0)
         plt.gca().add_collection(lc)
 
     ax.set_xlim(alpha.min(), alpha.max())
-    ax.set_ylim(0, 1.2*E.max())  # 2:3.5, 3: 6.5, 4:10.5
-    ax.legend(handles=legend_elements)
+    ax.set_ylim(0, 1.2*E[0:Mshow,:].max())  # 2:3.5, 3: 6.5, 4:10.5
+    ax.legend(handles=legend_elements, loc=2)
 
     return fig, ax
 

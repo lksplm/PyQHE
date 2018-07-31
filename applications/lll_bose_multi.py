@@ -12,7 +12,7 @@ import pickle
 def Vint(j, k, l, m):
     return factorial(j + k) / (2 ** (j + k) * sqrt(factorial(j) * factorial(k) * factorial(l) * factorial(m)))
 
-alpha = np.linspace(np.finfo(float).eps, 0.3, 100)#[np.finfo(float).eps] #np.linspace(np.finfo(float).eps, 1.0, 100)
+alpha = [np.finfo(float).eps] ##np.linspace(np.finfo(float).eps, 1.0, 100)
 Ns=[8]#3,4,5,6
 
 for N in Ns:

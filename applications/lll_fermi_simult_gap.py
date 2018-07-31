@@ -7,12 +7,12 @@ from itertools import product
 from math import sqrt, factorial
 from pyqhe.basis import BasisFermi
 from pyqhe.hamiltonian import OperatorLinCy, OperatorQuadCy, OperatorQuadDeltaCy
-from pyqhe.plotting import hinton_fast, energy_spin
+from pyqhe.plotting import hinton_fast
 from pyqhe.eigensystem import Eigensystem, Observable
-import pickle
+#import pickle
+from joblib import dump
 
-
-basis = BasisFermi(N=[2,2], m=[8,8])
+basis = BasisFermi(N=[3,3], m=[8,8])
 
 diag_sites = [(i,i) for i in range(basis.m[0])]
 coeff_l = lambda i, j, s, p: i*(i==j)
@@ -35,7 +35,11 @@ p_sites = [(i,i+2) for i in range(basis.m[0]-2)]+[(i+2,i) for i in range(basis.m
 coeff_p = lambda i, j, s, p: np.sqrt((min(i,j)+1)*(min(i,j)+2))
 Hpa = OperatorLinCy(basis, site_indices=p_sites, spin_indices=[(0,0)], op_func=coeff_p)
 Hpb = OperatorLinCy(basis, site_indices=p_sites, spin_indices=[(1,1)], op_func=coeff_p)
-Hp = Hpa + Hpb
+
+coeff_pc = lambda i, j, s, p:  i+1
+Hpc = OperatorLinCy(basis, site_indices=diag_sites, spin_indices=[(0,0), (1,1)], op_func=coeff_pc)
+
+Hp = Hpa + Hpb + Hpc
 print("Hp hermitian: ",Hp.is_hermitian())
 print("Starting diagonalisation...", flush=True)
 
@@ -50,81 +54,32 @@ Spin = Observable("S", S)
 print("[L, S^2] = 0: ",S.commutes(H0))
 print("[Hint, S^2] = 0: ",S.commutes(Hint))
 
-alpha = np.linspace(np.finfo(float).eps, 0.5, 30)
+alpha = np.linspace(np.finfo(float).eps, 0.5, 100)#0.5
+eps = np.linspace(np.finfo(float).eps, 0.1, 50)
 
-eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.25], [0.01]], M=50, simult_obs=Spin, simult_seed=[2j])
+#eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.25], eps], full=True, simult_obs=Spin)
+eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.125, .25, 0.5, 1.0], [0.02]], M=50, simult_obs=Spin, simult_seed=[0j, 2j, 6j, 12j])
+#eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.25], eps], M=50, simult_obs=Spin, simult_seed=[0j, 2j, 6j])
+#eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.25], eps], M=10, simult_obs=Spin, simult_seed=[2j])
 #eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [.25]], M=50, simult_obs=Spin, simult_seed=[0j, 2j, 6j, 12j, 20j])
 #eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [.25]], full=True, simult_obs=Spin)
-
-eigsys.add_observable(name="L", op=H0)
-eigsys.add_observable(name="Eint", op=Hint)
-#eigsys.add_observable(name="S", op=S)
-
-L = eigsys.get_observable("L") #np.empty((self.M, *self.param_shape))
-Eint = eigsys.get_observable("Eint")
-
-
-_, ax = eigsys.plot_observable("E")
-ax.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
-ax.set_xlabel(r'$\alpha$')
-ax.set_ylabel(r'$E$')
-
-_, ax2 = eigsys.plot_observable("L", Mshow=3)
-ax2.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
-ax2.set_xlabel(r'$\alpha$')
-ax2.set_ylabel(r'$L$')
-
-_, ax3 = eigsys.plot_observable("S")
-ax3.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
-ax3.set_xlabel(r'$\alpha$')
-ax3.set_ylabel(r'$S$')
-
-
+"""
+E = np.squeeze(eigsys.get_observable("E"))
 
 plt.figure()
+for i in range(20):
+    plt.plot(alpha, np.sort(E[i,:,-1], axis=0))
 
-plt.plot(L[:,1:,:].flatten(), Eint[:,1:,:].flatten(), 'o')
-
-# plt.plot(Ltots[idx[0],8], Energies[idx[0],8], 'ro')
-#plt.xticks(np.arange(0, np.max(Ltots), 2))
-plt.legend()
-plt.xlabel('$L$')
-plt.ylabel('$E_{int}/U$')
-#plt.title('$N_{{\\uparrow={:d} }}, N_{{\\downarrow={:d} }}, m={:d}$'.format(N_up, N_dwn, L_dwn))
-
-S_res = eigsys.get_observable("S")
-
-Splt = S_res.copy()
-Splt[Splt < 1.e-5] = 0
-Splt[np.isnan(Splt)] = -1
-Splt = np.array(np.round(Splt), dtype=np.int)
-Slbl = np.unique(Splt)
-print(Slbl)
-Splt2 = Splt.copy()
-for i, spi in enumerate(Slbl):
-    Splt[Splt2 == spi] = i
-
-cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
-marker = ['^', 'v', '*']
-cmap = ListedColormap(cycle)
-norm = BoundaryNorm(np.arange(len(Slbl) + 1) - 0.5, ncolors=len(Slbl))
-
-legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker=marker[i], label='S={:d}'.format(s)) for i, s in
-                   enumerate(Slbl)]
 plt.figure()
-for i, s in enumerate(Slbl):
-    idx = (Splt == i)
-    plt.scatter(L[idx], Eint[idx], c=Splt[idx], marker=marker[i], facecolor='none', alpha=0.5, cmap=cmap,
-                norm=norm)
-plt.legend(handles=legend_elements)
-
-E = eigsys.get_observable("E")
-energy_spin(alpha, E, S_res)
-
+#plt.pcolormesh(alpha, eps, -(E[1,:,:]-E[0,:,:]).T, cmap='jet')
+plt.imshow( -(E[1,:,:]-E[0,:,:]).T, cmap='viridis_r', interpolation='bicubic', origin='lower')
+plt.colorbar()
+plt.title(r'Gap $\Delta = E_1-E_0$')
+plt.xlabel(r"$\alpha$")
+plt.ylabel(r"$\epsilon$")
 plt.show()
 """
 
 savedict = {'states': basis.states, 'Esys': eigsys}
-pickle.dump(savedict,open("results/result_simult_full_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), "wb" ))
-
-"""
+#pickle.dump(savedict,open("results/result_simult_full_gap_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), "wb" ))
+dump(savedict,"results/result_simult_gap_sclaing_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), compress=3) #scaling
