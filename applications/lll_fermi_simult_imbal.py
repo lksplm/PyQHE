@@ -9,7 +9,7 @@ from pyqhe.plotting import hinton_fast, spectrum_spin, energy_spin
 from pyqhe.eigensystem import Eigensystem, Observable
 import pickle
 
-basis = BasisFermi(N=[4,4], m=[10,10])
+basis = BasisFermi(N=[4,3], m=[10,10])
 
 diag_sites = [(i,i) for i in range(basis.m[0])]
 coeff_l = lambda i, j, s, p: i*(i==j)
@@ -27,15 +27,6 @@ for j, k, l, m in int_sites:
 Hint = OperatorQuadDeltaCy(basis, coeff=coeff)
 print("Hint hermitian: ",Hint.is_hermitian())
 
-"""
-p_sites = [(i,i+2) for i in range(basis.m[0]-2)]+[(i+2,i) for i in range(basis.m[0]-2)]
-coeff_p = lambda i, j, s, p: np.sqrt((min(i,j)+1)*(min(i,j)+2))
-Hpa = OperatorLinCy(basis, site_indices=p_sites, spin_indices=[(0,0)], op_func=coeff_p)
-Hpb = OperatorLinCy(basis, site_indices=p_sites, spin_indices=[(1,1)], op_func=coeff_p)
-Hp = Hpa + Hpb
-del Hpa, Hpb
-print("Hp hermitian: ",Hp.is_hermitian())
-"""
 
 Sa = OperatorLinCy(basis, site_indices=diag_sites, spin_indices=[(0,0)], op_func=1.)
 s_sites = [(p,k,k,p) for k,p in product(range(basis.m[0]), repeat=2)]
@@ -49,46 +40,19 @@ print("[Hint, S^2] = 0: ",S.commutes(Hint))
 print("Starting diagonalisation...", flush=True)
 
 alpha = np.linspace(np.finfo(float).eps, 0.4, 10)
-#eps = np.linspace(np.finfo(float).eps, 0.1, 100)
-#eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [0.25], eps], M=10)
-#eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=100)
-eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=100, simult_obs=Sop, simult_seed=[0j, 2j, 6j, 12j, 20j]) #[0.75j, 3.75j]
+seeds = [1j*(a/2)*(a/2+1) for a in range(1,10,2)]
+seed = seeds[0:(basis.N[0])]
+print(seed)
+
+eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=100, simult_obs=Sop, simult_seed=seed) #[0.75j, 3.75j]
 #eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], simult_obs=Sop, full=True) #
 
 eigsys.add_observable(name="L", op=H0)
 eigsys.add_observable(name="Eint", op=Hint)
-#eigsys.add_observable(name="S", op=S)
+
 #Modify spin
 Sz = 0.5*(basis.N[1]-basis.N[0])
 eigsys.Observables["S"].eigenvalues = -0.5+np.sqrt(0.25+(eigsys.Observables["S"].eigenvalues+Sz*(Sz+1)))
-"""
-L = eigsys.get_observable("L")
-Eall = eigsys.get_observable("E")
-Eint = eigsys.get_observable("Eint")
-Spin = eigsys.get_observable("S")
 
-_, ax = eigsys.plot_observable("E")
-ax.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
-ax.set_xlabel(r'$\alpha$')
-ax.set_ylabel(r'$E$')
-
-_, ax2 = eigsys.plot_observable("L")
-ax2.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
-ax2.set_xlabel(r'$\alpha$')
-ax2.set_ylabel(r'$L$')
-
-_, ax3 = eigsys.plot_observable("S", Mshow=10)
-ax3.set_title(r"Spectrum depending on $\alpha$ for $\eta=0.25$")
-ax3.set_xlabel(r'$\alpha$')
-ax3.set_ylabel(r'$S$')
-
-print(Spin)
-
-_, ax4 = spectrum_spin(L, Eint, Spin, integer=False)
-_, ax5 = energy_spin(alpha, L, Eall, Spin, integer=False)
-
-plt.show()
-"""
 savedict = {'states': basis.states, 'Esys': eigsys}
 pickle.dump(savedict,open("results/result_simult_imbal_{:d}_{:d}_{:d}_{:d}.p".format(*basis.N, *basis.m), "wb" ))
-#_imbal_full

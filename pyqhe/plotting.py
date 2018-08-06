@@ -15,6 +15,82 @@ def format_spin(s):
     f = Fraction(int(s*2), 2)
     return "{:d}/{:d}".format(f.numerator, f.denominator)
 
+def unique_close(a,rtol=1.0e-5, atol=0.0, return_index=False):
+    out = []
+    outind = []
+    a = np.array(a)
+    c = a.copy()
+    cind = np.arange(len(c))
+    while len(c)>0:
+        b = c[0]
+        out.append(b)
+        outind.append(cind[0])
+        ind = np.where(np.abs(c- b)<=(atol + rtol * np.abs(b)))[0]
+        c = np.delete(c, ind)
+        cind = np.delete(cind, ind)
+    if return_index:
+        return np.array(out), np.array(outind)
+    else:
+        return np.array(out)
+
+
+def spectrum_spin_mod(L, Eint, S, ax=None, integer=True, rdigits=5, atol=1.0e-6, rtol=1e-2):
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+    else:
+        fig = None
+
+    ls = L.flatten().round().astype(np.int)
+    es = Eint.flatten()
+    ss = S.flatten()
+    mask = np.isfinite(ls) & (ls >= 0) & np.isfinite(es) & np.isfinite(ss)
+    ls, es, ss = ls[mask], es[mask], ss[mask]
+
+    if integer:
+        ss = ss.round().astype(np.int)
+    else:
+        ss = ss.round(rdigits)
+
+    lu = np.unique(ls)
+    su = np.unique(ss)
+    print("Found L: ", lu, " and S: ", su)
+    eun = []
+    lun = []
+    sun = []
+    # for each spin and l
+    for j, s in enumerate(su):
+        for i, l in enumerate(lu):
+            ind = np.where((ls == l) & (ss == s))[0]
+            if len(ind) > 0:
+                etmp, indu = unique_close(es[ind], return_index=True, atol=atol, rtol=rtol)
+                eun.append(etmp)
+                lun.append(ls[ind][indu])
+                sun.append(ss[ind][indu])
+
+    eun = np.concatenate(eun)
+    lun = np.concatenate(lun)
+    sun = np.concatenate(sun)
+
+    cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    marker = ['^', 'v', 'o', '*', 's', '+', 'X', 'h', 'p']
+    offs = np.linspace(-0.2, 0.2, len(su), endpoint=True)
+
+    if ss.dtype == np.int:
+        legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker=marker[i], label='S={:d}'.format(s)) for i, s in
+                           enumerate(su)]
+    else:
+        legend_elements = [plt.Line2D([0], [0], color=cycle[i], marker=marker[i], label='S={}'.format(format_spin(s)))
+                           for i, s in
+                           enumerate(su)]
+
+    for i, s in enumerate(su):
+        idx = (sun == s)
+        ax.plot(lun[idx] + offs[i], eun[idx], color=cycle[i], marker=marker[i], markerfacecolor='None', ls='None')
+
+    ax.legend(handles=legend_elements)
+
+    return fig, ax
+
 def energy_spin(alpha, E, S, Mshow=10, ax=None, integer=True, **kwargs):
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))

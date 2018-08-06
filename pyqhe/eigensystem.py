@@ -26,10 +26,18 @@ class Eigensystem:
             self.M = L
 
         self.ops_list = ops_list
-        self.param_list = param_list
-        self.param_idx = [range(len(p)) for p in self.param_list]
-        self.param_shape = [len(p) for p in self.param_list]
-        self.param_array = np.empty((Nop, *self.param_shape))
+        if isinstance(param_list, list):
+            self.param_list = param_list
+            self.param_idx = [range(len(p)) for p in self.param_list]
+            self.param_shape = [len(p) for p in self.param_list]
+            self.param_array = np.empty((Nop, *self.param_shape))
+            param_iterator = zip(product(*self.param_idx), product(*self.param_list))
+        else: #param_list is already an array
+            self.param_list = param_list
+            self.param_shape = np.shape(param_list)
+            self.param_array = np.empty((Nop, *self.param_shape))
+            param_iterator = np.ndenumerate(param_list)
+
         self.eigenenergy = np.empty((self.M, *self.param_shape))
         if simult_obs is not None:
             assert isinstance(simult_obs, Observable), "simult_obs must be an Observable"
@@ -40,7 +48,7 @@ class Eigensystem:
             eig_simult = np.empty(self.M)
         self.eigenstate = np.empty((L, self.M, *self.param_shape), dtype=np.complex64)
 
-        for j, p in tqdm(zip(product(*self.param_idx), product(*self.param_list)), total=np.array(self.param_shape).prod()):
+        for j, p in tqdm(param_iterator, total=np.array(self.param_shape).prod()):
             H = sp.coo_matrix(self.ops_list[0].shape)
             for i in range(Nop):
                 H += ops_list[i].sp * p[i]

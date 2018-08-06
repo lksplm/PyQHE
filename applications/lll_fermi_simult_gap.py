@@ -12,7 +12,7 @@ from pyqhe.eigensystem import Eigensystem, Observable
 #import pickle
 from joblib import dump
 
-basis = BasisFermi(N=[3,3], m=[8,8])
+basis = BasisFermi(N=[4,4], m=[10,10])
 
 diag_sites = [(i,i) for i in range(basis.m[0])]
 coeff_l = lambda i, j, s, p: i*(i==j)
@@ -54,11 +54,16 @@ Spin = Observable("S", S)
 print("[L, S^2] = 0: ",S.commutes(H0))
 print("[Hint, S^2] = 0: ",S.commutes(Hint))
 
-alpha = np.linspace(np.finfo(float).eps, 0.5, 100)#0.5
+alpha = np.linspace(np.finfo(float).eps, 2.0, 100)#0.5
 eps = np.linspace(np.finfo(float).eps, 0.1, 50)
+eta = np.array([.125, .25, 0.5, 1.0])
+param_array = np.empty((alpha.shape[0], eta.shape[0]),dtype=object)
+for i, a in enumerate(alpha):
+    for j, e in enumerate(eta):
+        param_array[i,j] = [a*e,e,0.02]
 
 #eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.25], eps], full=True, simult_obs=Spin)
-eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.125, .25, 0.5, 1.0], [0.02]], M=50, simult_obs=Spin, simult_seed=[0j, 2j, 6j, 12j])
+eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=param_array, M=50, simult_obs=Spin, simult_seed=[0j, 2j, 6j, 12j])
 #eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.25], eps], M=50, simult_obs=Spin, simult_seed=[0j, 2j, 6j])
 #eigsys = Eigensystem(ops_list=[H0, Hint, Hp], param_list=[alpha, [.25], eps], M=10, simult_obs=Spin, simult_seed=[2j])
 #eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [.25]], M=50, simult_obs=Spin, simult_seed=[0j, 2j, 6j, 12j, 20j])
@@ -82,4 +87,4 @@ plt.show()
 
 savedict = {'states': basis.states, 'Esys': eigsys}
 #pickle.dump(savedict,open("results/result_simult_full_gap_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), "wb" ))
-dump(savedict,"results/result_simult_gap_sclaing_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), compress=3) #scaling
+dump(savedict,"results/result_simult_gap_scalingrel_{:d}_{:d}.p".format(basis.m[0], basis.N[0]), compress=3) #scaling
