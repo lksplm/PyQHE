@@ -36,6 +36,7 @@ class Eigensystem:
             self.param_list = param_list
             self.param_shape = np.shape(param_list)
             self.param_array = np.empty((Nop, *self.param_shape))
+            self.param_idx = [range(p) for p in self.param_list.shape]
             param_iterator = np.ndenumerate(param_list)
 
         self.eigenenergy = np.empty((self.M, *self.param_shape))

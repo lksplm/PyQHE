@@ -1,3 +1,6 @@
+import sys, os
+#sys.path.append(os.path.abspath('../../PyQHE/'))
+os.environ['MKL_NUM_THREADS'] = '4'
 import numpy as np
 from scipy.special import factorial
 import matplotlib.pyplot as plt
@@ -9,31 +12,47 @@ from pyqhe.plotting import hinton_fast
 from pyqhe.eigensystem import Eigensystem, Observable
 #import pickle
 from joblib import dump
+from joblib import Memory
 
-basis = BasisFermi(N=[5,5], m=[12,12])
+cachedir = 'cache'
+if not os.path.isdir(cachedir): os.mkdir(cachedir)
+memory = Memory(cachedir=cachedir, verbose=True)
 
-diag_sites = [(i,i) for i in range(basis.m[0])]
-coeff_l = lambda i, j, s, p: i*(i==j)
-H0 = OperatorLinCy(basis, site_indices=diag_sites, spin_indices=[(0,0), (1,1)], op_func=coeff_l)
+basis = BasisFermi(N=[3,3], m=[8,8])
 
+@memory.cache
+def comp_H0(basis):
+    diag_sites = [(i,i) for i in range(basis.m[0])]
+    coeff_l = lambda i, j, s, p: i*(i==j)
+    return OperatorLinCy(basis, site_indices=diag_sites, spin_indices=[(0,0), (1,1)], op_func=coeff_l)
+
+@memory.cache
+def comp_H1(basis):
+    int_sites = [(j,k,l,m) for j,k,l,m in product(range(basis.m[0]), repeat=4) if j+k-l-m==0]
+    def Vint(j, k, l, m):
+        return factorial(j + k) / (2 ** (j + k) * sqrt(factorial(j) * factorial(k) * factorial(l) * factorial(m)))
+    coeff = np.zeros((basis.m[0],basis.m[0],basis.m[0],basis.m[0]), dtype=np.float64)
+    for j, k, l, m in int_sites:
+        coeff[j, k, l, m] = Vint(j, k, l, m)
+
+    return OperatorQuadDeltaCy(basis, coeff=coeff)
+
+@memory.cache
+def comp_H2(basis):
+    diag_sites = [(i, i) for i in range(basis.m[0])]
+    Sa = OperatorLinCy(basis, site_indices=diag_sites, spin_indices=[(0,0)], op_func=1.)
+    s_sites = [(p,k,k,p) for k,p in product(range(basis.m[0]), repeat=2)]
+
+    Sb = OperatorQuadCy(basis, site_indices=s_sites, spin_indices=[(1,0,1,0)], op_func_site=1., op_func_spin=1.)
+    return Sa + Sb
+
+H0 = comp_H0(basis)
 print("H0 hermitian: ",H0.is_hermitian())
-int_sites = [(j,k,l,m) for j,k,l,m in product(range(basis.m[0]), repeat=4) if j+k-l-m==0]
 
-def Vint(j, k, l, m):
-    return factorial(j + k) / (2 ** (j + k) * sqrt(factorial(j) * factorial(k) * factorial(l) * factorial(m)))
-
-coeff = np.zeros((basis.m[0],basis.m[0],basis.m[0],basis.m[0]), dtype=np.float64)
-for j, k, l, m in int_sites:
-    coeff[j, k, l, m] = Vint(j, k, l, m)
-
-Hint = OperatorQuadDeltaCy(basis, coeff=coeff)
+Hint = comp_H1(basis)
 print("Hint hermitian: ",Hint.is_hermitian())
 
-Sa = OperatorLinCy(basis, site_indices=diag_sites, spin_indices=[(0,0)], op_func=1.)
-s_sites = [(p,k,k,p) for k,p in product(range(basis.m[0]), repeat=2)]
-
-Sb = OperatorQuadCy(basis, site_indices=s_sites, spin_indices=[(1,0,1,0)], op_func_site=1., op_func_spin=1.)
-S = Sa + Sb
+S = comp_H2(basis)
 print("S hermitian: ",S.is_hermitian())
 Spin = Observable("S", S)
 

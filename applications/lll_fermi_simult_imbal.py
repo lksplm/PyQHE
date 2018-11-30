@@ -9,7 +9,8 @@ from pyqhe.plotting import hinton_fast, spectrum_spin, energy_spin
 from pyqhe.eigensystem import Eigensystem, Observable
 import pickle
 
-basis = BasisFermi(N=[4,3], m=[10,10])
+basis = BasisFermi(N=[3,4], m=[10,10])
+Sz = 0.5*(basis.N[1]-basis.N[0])
 
 diag_sites = [(i,i) for i in range(basis.m[0])]
 coeff_l = lambda i, j, s, p: i*(i==j)
@@ -40,8 +41,8 @@ print("[Hint, S^2] = 0: ",S.commutes(Hint))
 print("Starting diagonalisation...", flush=True)
 
 alpha = np.linspace(np.finfo(float).eps, 0.4, 10)
-seeds = [1j*(a/2)*(a/2+1) for a in range(1,10,2)]
-seed = seeds[0:(basis.N[0])]
+seeds = [1j*((a/2)*(a/2+1)-(Sz*(Sz+1))) for a in range(1,10,2)]
+seed = seeds[0:(basis.N[1])]
 print(seed)
 
 eigsys = Eigensystem(ops_list=[H0, Hint], param_list=[alpha, [0.25]], M=100, simult_obs=Sop, simult_seed=seed) #[0.75j, 3.75j]
@@ -51,8 +52,9 @@ eigsys.add_observable(name="L", op=H0)
 eigsys.add_observable(name="Eint", op=Hint)
 
 #Modify spin
-Sz = 0.5*(basis.N[1]-basis.N[0])
+print(np.unique(np.round(eigsys.Observables["S"].eigenvalues,3)))
 eigsys.Observables["S"].eigenvalues = -0.5+np.sqrt(0.25+(eigsys.Observables["S"].eigenvalues+Sz*(Sz+1)))
+print(np.unique(np.round(eigsys.Observables["S"].eigenvalues,3)))
 
 savedict = {'states': basis.states, 'Esys': eigsys}
 pickle.dump(savedict,open("results/result_simult_imbal_{:d}_{:d}_{:d}_{:d}.p".format(*basis.N, *basis.m), "wb" ))
