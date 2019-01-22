@@ -141,7 +141,7 @@ class BasisBose(Basis):
         return f, self.index(new_state)
 
 class BasisFermi(Basis):
-    def __init__(self, N=[2,2], m=None):
+    def __init__(self, N=[2,2], m=None, spin_conserved=True):
         self.N_spin_comp = len(N)
         self.N = N
         if m is not None:
@@ -149,28 +149,64 @@ class BasisFermi(Basis):
         else:
             self.m = np.array([2*n for n in self.N])
 
-        states_spin = [combinations(range(m), n) for n, m in zip(self.N, self.m)]
-        Nstates_total = int(np.prod([int(binom(m, n)) for n, m in zip(self.N, self.m)]))
-        m_total = int(np.sum(self.m))
-        self.basis = np.zeros((Nstates_total, m_total), dtype=np.int8)
-        st_fermi = product(*states_spin)
-        self.basis_l = np.zeros(Nstates_total, dtype=np.int)
-        self.offs_arr  = np.insert(self.m[:-1], 0, 0)
-        self.offs_arr_end = np.insert(self.m[1:], -1, -1)
-        l_diag = np.concatenate([np.arange(m) for m in self.m])
-        for i, idx in enumerate(st_fermi):
-            s = np.zeros(m_total, dtype=np.uint8)
-            for j, m in enumerate(self.m):
-                np.add.at(s, np.array(idx[j]) + self.offs_arr[j], 1)
-
-            self.basis[i, :] = s
-            self.basis_l[i] = np.sum(s * l_diag)
-
-        idx = np.argsort(self.basis_l)
-        self.basis, self.basis_l = self.basis[idx], self.basis_l[idx]
+        if spin_conserved:
+            self.basis, self.basis_l = self._build_basis(self.N, self.m)
+        else:
+            self.basis, self.basis_l = self._build_basis_snc(self.N, self.m)
 
         self.Nbasis = self.basis.shape[0]
-        self.basis_lut = dict(zip(tuple(map(tuple, self.basis)), range(self.Nbasis)))
+        self._build_lut()
+
+    def _build_basis(self, N, ms):
+        """
+        Generate Fermionic Basis for multiple (spin) components where the spin (i.e. particles per component) is conserved
+        :param N: list [N0, N1,...] particles per component
+        :param ms: list [m0, m1,...] angular momentum cutoff per component
+        :return: basis array [Nstates,Mtotal], angular momenta of all states [Nstates]
+        """
+        states_spin = [combinations(range(m), n) for n, m in zip(N, ms)] #generate all possible indices for particles per component, combinations ensures no double occupacies
+        Nstates_total = int(np.prod([int(binom(m, n)) for n, m in zip(N, ms)])) #compute total number of states as binomoial coefficient
+        m_total = int(np.sum(ms))
+        basis = np.zeros((Nstates_total, m_total), dtype=np.int8) #set up basis array
+        st_fermi = product(*states_spin) #cartesian product between all components generates all states, still indices
+        basis_l = np.zeros(Nstates_total, dtype=np.int) #angular momentum "operator" (diagonal in this basis)/index per component
+        self.offs_arr = np.insert(ms[:-1], 0, 0) #compute offsets for each component for indexing
+        self.offs_arr_end = np.insert(ms[1:], -1, -1)
+        l_diag = np.concatenate([np.arange(m) for m in ms])
+        for i, idx in enumerate(st_fermi):
+            s = np.zeros(m_total, dtype=np.uint8)
+            for j, m in enumerate(ms):
+                if idx[j]: #ensure that list of indices is not empty
+                    np.add.at(s, np.array(idx[j]) + self.offs_arr[j], 1) #create vector of zeros and add ones at particle indices
+            basis[i, :] = s #insert into basis array
+            basis_l[i] = np.sum(s * l_diag) #compute L for this state
+
+        idx = np.argsort(basis_l) #sort all states wiht increasing L
+        return basis[idx], basis_l[idx]
+
+        
+    def _build_basis_snc(self,N, ms):
+        """
+        generate basis when Spin is not conserved
+        Only total number of particles is constant, distribute this number among all components and concatenate the resulting bases
+
+        Test implementation, only for two components
+        :return:
+        """
+        Ntotal = sum(N)
+        bases = []
+        bases_ls = []
+        for i in range(Ntotal+1):
+            #print("i={:d}, N=[{:d},{:d}]".format(i,Ntotal-i,i))
+            b, l = self._build_basis([Ntotal-i,i],ms)
+            bases.append(b)
+            bases_ls.append(l)
+        bases = np.concatenate(bases, axis=0)
+        bases_ls = np.concatenate(bases_ls, axis=0)
+        idx = np.argsort(bases_ls)  # sort all states wiht increasing L
+        return bases[idx], bases_ls[idx]
+        #return bases, bases_ls
+
 
     def _build_lut(self):
         self.basis_lut = dict(zip(tuple(map(tuple, self.basis)), range(self.Nbasis)))

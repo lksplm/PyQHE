@@ -134,7 +134,7 @@ class OperatorQuadCy(Operator):
         if callable(op_func_site):
             coeff_site = np.zeros((basis.m[0], basis.m[0], basis.m[0], basis.m[0]), dtype=np.float64)
             for j, site_i in enumerate(site_indices):
-                coeff_site[j] = op_func_site(*site_i)
+                coeff_site[site_i] = op_func_site(*site_i)
 
         elif isinstance(op_func_site, np.ndarray):
             assert op_func_site.shape == (basis.m[0], basis.m[0], basis.m[0], basis.m[0])
@@ -145,7 +145,7 @@ class OperatorQuadCy(Operator):
         if callable(op_func_spin):
             coeff_spin = np.ones((2, 2, 2, 2), dtype=np.float64)
             for i, spin_i in enumerate(spin_indices):
-                coeff_spin[i] = op_func_spin(*spin_i)
+                coeff_spin[spin_i] = op_func_spin(*spin_i)
         elif isinstance(op_func_spin, np.ndarray):
             assert op_func_spin.shape == (2, 2, 2, 2)
             coeff_spin = np.array(op_func_spin, dtype=np.float64)

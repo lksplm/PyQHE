@@ -104,7 +104,8 @@ class Eigensystem:
                 v = obs.op.dot(st) #return eigenvalue*eigenvector
 
                 norm = np.abs(st.conj() @ st)
-                s = np.abs(st.conj() @ v) / norm
+                #s = np.abs(st.conj() @ v) / norm
+                s = np.real(st.conj() @ v) / norm
                 var = np.abs(st.conj() @ (S2.dot(st))) / norm - s ** 2
                 if var > 1.e-7:
                     s = np.nan
