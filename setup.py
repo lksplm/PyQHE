@@ -4,7 +4,7 @@ from Cython.Build import cythonize
 import numpy as np
 
 extensions = [
-    Extension('pyqhe.cython.hamiltonian_cy', ['pyqhe/cython/hamiltonian_cy.pyx'], include_dirs = [np.get_include()],language="c++"),
+    Extension('pyqhe.cython.hamiltonian_cy', ['pyqhe/cython/hamiltonian_cy.pyx'], extra_compile_args=['/openmp'], extra_link_args=['/openmp'], include_dirs = [np.get_include()],language="c++"),
     Extension('pyqhe.cython.hamiltonian_bose_cy', ['pyqhe/cython/hamiltonian_bose_cy.pyx'], include_dirs = [np.get_include()],language="c++"),
     ]
 

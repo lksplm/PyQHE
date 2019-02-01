@@ -5,13 +5,12 @@ from itertools import product, combinations, combinations_with_replacement
 from scipy.special import binom, factorial
 from scipy.linalg import eigh, eigvalsh
 from numba import jit
-
+from .cython.hamiltonian_cy import state_to_int
 
 def multichoose(r, s):
     return int(binom(r+s-1, s))
 
 class Basis:
-
     def __init__(self):
         self.basis = []
         self.Nbasis = 0
@@ -155,7 +154,9 @@ class BasisFermi(Basis):
             self.basis, self.basis_l = self._build_basis_snc(self.N, self.m)
 
         self.Nbasis = self.basis.shape[0]
+        self.Lbasis = self.basis.shape[1]
         self._build_lut()
+        self._basis_map = None
 
     def _build_basis(self, N, ms):
         """
@@ -167,7 +168,7 @@ class BasisFermi(Basis):
         states_spin = [combinations(range(m), n) for n, m in zip(N, ms)] #generate all possible indices for particles per component, combinations ensures no double occupacies
         Nstates_total = int(np.prod([int(binom(m, n)) for n, m in zip(N, ms)])) #compute total number of states as binomoial coefficient
         m_total = int(np.sum(ms))
-        basis = np.zeros((Nstates_total, m_total), dtype=np.int8) #set up basis array
+        basis = np.zeros((Nstates_total, m_total), dtype=np.uint8) #set up basis array
         st_fermi = product(*states_spin) #cartesian product between all components generates all states, still indices
         basis_l = np.zeros(Nstates_total, dtype=np.int) #angular momentum "operator" (diagonal in this basis)/index per component
         self.offs_arr = np.insert(ms[:-1], 0, 0) #compute offsets for each component for indexing
@@ -210,6 +211,19 @@ class BasisFermi(Basis):
 
     def _build_lut(self):
         self.basis_lut = dict(zip(tuple(map(tuple, self.basis)), range(self.Nbasis)))
+
+    @property
+    def lookup_map(self):
+        if self._basis_map is None:
+            self._build_map()
+        return self._basis_map
+
+    def _build_map(self):
+        L = self.basis.shape[1]
+        bint = np.array([state_to_int(self.basis[i,:], L) for i in range(self.basis.shape[0])]) #convert bool vector to integer
+        lookup = np.ones(max(bint) + 1, dtype=np.int32) * -1 #unoccupied array sites get -1, i.e. no state
+        lookup[bint] = np.arange(self.basis.shape[0])
+        self._basis_map = lookup
 
     def _c_dagger(self, state, i, spin):
         j = self.offs_arr[spin]+i
