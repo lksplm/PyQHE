@@ -2,6 +2,9 @@
 import numpy as np
 cimport numpy as np
 cimport cython
+cimport openmp
+from cython.parallel cimport parallel, prange, threadid
+from libc.stdlib cimport malloc, free
 
 from scipy.sparse import coo_matrix
 from libcpp.vector cimport vector
@@ -266,7 +269,7 @@ def density_matrix(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32
     cdef data_type_t [:] sp = sp_np
     cdef data_type_t [:] spp = spp_np
 
-    rho =  np.zeros((Ldwn,Ldwn), dtype=np.float64)
+    cdef np.complex64_t [:,:] rho  =  np.zeros((Ldwn,Ldwn), dtype=np.float64)
 
     for i in range(Nstates):
         state[:] = basis[i,:]
@@ -286,7 +289,7 @@ def density_matrix(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.int32
                         #print(i, idx)
                         rho[k,j] += f1*f3*state_vec[i]*state_vec[idx]
 
-    return rho
+    return np.asarray(rho)
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
@@ -311,7 +314,7 @@ def density_matrix_two(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.i
     cdef data_type_t [:] sp = sp_np
     cdef data_type_t [:] spp = spp_np
 
-    rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.float64)
+    cdef np.complex64_t [:,:,:,:] rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.float64)
 
     for i in range(Nstates):
         state[:] = basis[i,:]
@@ -331,7 +334,7 @@ def density_matrix_two(np.float64_t [:] state_vec, data_type_t [:,:] basis, np.i
                                 idx = cy_lut[tuple(spp)]
                                 rho[m,l,k,j] += f1*f2*f3*f4*state_vec[i]*state_vec[idx]
 
-    return rho
+    return np.asarray(rho)
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
@@ -356,7 +359,7 @@ def expectation_quad(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.i
     cdef data_type_t [:] sp = sp_np
     cdef data_type_t [:] spp = spp_np
 
-    rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
+    cdef np.complex64_t [:,:,:,:] rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
 
     for i in range(Nstates):
         state[:] = basis[i,:]
@@ -383,7 +386,7 @@ def expectation_quad(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.i
                                     pass
                                 """
 
-    return rho
+    return np.asarray(rho)
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
@@ -408,7 +411,7 @@ def expectation_lin(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.in
     cdef data_type_t [:] sp = sp_np
     cdef data_type_t [:] spp = spp_np
 
-    rho =  np.zeros((Ldwn,Ldwn), dtype=np.complex64)
+    cdef np.complex64_t [:,:] rho  =  np.zeros((Ldwn,Ldwn), dtype=np.complex64)
 
     for i in range(Nstates):
         state[:] = basis[i,:]
@@ -428,7 +431,7 @@ def expectation_lin(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.in
                         #print(i, idx)
                         rho[k,j] += f1*f3*np.conj(state_vec[i])*state_vec[idx]
 
-    return rho
+    return np.asarray(rho)
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
@@ -455,7 +458,7 @@ def expectation_six(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.in
     cdef data_type_t [:] spp = spp_np
     cdef data_type_t [:] sppp = sppp_np
 
-    rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
+    cdef np.complex64_t [:,:,:,:,:,:] rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
 
     for i in range(Nstates):
         state[:] = basis[i,:]
@@ -482,7 +485,7 @@ def expectation_six(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.in
                                             idx = cy_lut[tuple(sppp)]
                                             rho[o,n,m,l,k,j] += f1*f2*f3*f4*f5*f6*np.conj(state_vec[i])*state_vec[idx]
 
-    return rho
+    return np.asarray(rho)
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -495,7 +498,7 @@ cpdef inline int state_to_int(data_type_t [:] state, Py_ssize_t N) nogil:
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
-def expectation_quad_test(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t  [:] cy_lut, np.int32_t siga, np.int32_t sigb, np.int32_t sigc, np.int32_t sigd, np.uint32_t Ldwn):
+def expectation_quad_test(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t [:] cy_lut, np.int32_t siga, np.int32_t sigb, np.int32_t sigc, np.int32_t sigd, np.uint32_t Ldwn):
     """
     Computes the density matrix \rho_ijkl^(spina, spinb, spinc, spind)
     :param basis: all basis states, shape [Nstates, mtotal]
@@ -522,7 +525,7 @@ def expectation_quad_test(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
     cdef data_type_t [:] sp = sp_np
     cdef data_type_t [:] spp = spp_np
 
-    rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
+    cdef np.complex64_t [:,:,:,:] rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
 
     for i in range(Nstates):
         state[:] = basis[i,:]
@@ -544,4 +547,227 @@ def expectation_quad_test(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
                                     rho[m,l,k,j] += f1*f2*f3*f4*(state_vec[i].conjugate())*state_vec[idx]
 
 
-    return rho
+    return np.asarray(rho)
+
+@cython.boundscheck(False) # turn off bounds-checking for entire function
+@cython.wraparound(False)  # turn off negative index wrapping for entire function
+def expectation_six_test(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t [:] cy_lut, np.int32_t siga, np.int32_t sigb, np.int32_t sigc, np.int32_t sigd, np.int32_t sige, np.int32_t sigf, np.uint32_t Ldwn):
+    """
+    Computes the density matrix \rho_ijklmn^(spina, spinb, spinc, spind, spine, spinf)
+    :param basis: all basis states, shape [Nstates, mtotal]
+    :param Ldwn: cutoff for one spin sector
+    :return: \rho_ijkl
+    """
+    cdef Py_ssize_t Nstates = basis.shape[0]
+    cdef Py_ssize_t L = basis.shape[1]
+    cdef int i,j,k,l,m,n,o,f1,f2,f3,f4,f5,f6,idx
+
+    state_np =  np.zeros(L, dtype=data_type)
+    sp_np =  np.zeros(L, dtype=data_type)
+    spp_np =  np.zeros(L, dtype=data_type)
+    sppp_np =  np.zeros(L, dtype=data_type)
+    cdef data_type_t [:] state = state_np
+    cdef data_type_t [:] sp = sp_np
+    cdef data_type_t [:] spp = spp_np
+    cdef data_type_t [:] sppp = sppp_np
+
+    cdef np.complex64_t [:,:,:,:,:,:] rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
+
+    for i in range(Nstates):
+        state[:] = basis[i,:]
+        for j in range(Ldwn):
+            for k in range(Ldwn):
+                sp[:] = state
+                #check if two states j and k are occupied
+                f1 = c_(sp, j, sigf, Ldwn)
+                f2 = c_dagger(sp, k, sige, Ldwn)
+                if f1!=0 and f2 !=0:
+                    for l in range(Ldwn):
+                        for m in range(Ldwn):
+                            spp[:] = sp
+                            #check if two states j and k are occupied
+                            f3 = c_(spp, l, sigd, Ldwn)
+                            f4 = c_dagger(spp, m, sigc, Ldwn)
+                            if f3!=0 and f4!=0:
+                                for n in range(Ldwn):
+                                    for o in range(Ldwn):
+                                        sppp[:] = spp
+                                        f5 = c_(sppp, l, sigb, Ldwn)
+                                        f6 = c_dagger(sppp, m, siga, Ldwn)
+                                        if f5!=0 and f6!=0:
+                                            idx = cy_lut[state_to_int(sppp,L)]
+                                            if idx > -1:
+                                                rho[o,n,m,l,k,j] += f1*f2*f3*f4*f5*f6*(state_vec[i].conjugate())*state_vec[idx]
+
+    return np.asarray(rho)
+
+@cython.boundscheck(False) # turn off bounds-checking for entire function
+@cython.wraparound(False)  # turn off negative index wrapping for entire function
+def expectation_quad_test_par(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t  [:] cy_lut, np.int32_t siga, np.int32_t sigb, np.int32_t sigc, np.int32_t sigd, np.uint32_t Ldwn):
+    """
+    Computes the density matrix \rho_ijkl^(spina, spinb, spinc, spind)
+    :param basis: all basis states, shape [Nstates, mtotal]
+    :param Ldwn: cutoff for one spin sector
+    :return: \rho_ijkl
+    """
+
+    cdef Py_ssize_t Nstates = basis.shape[0]
+    cdef Py_ssize_t L = basis.shape[1]
+    cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+
+    #Test different lut, no dict
+    #lut = dict(zip(tuple(map(tuple, basis)), range(Nstates)))
+    #cdef dict cy_lut = lut
+    #bint = np.packbits(basis.reshape(-1, 2, 8)).view(np.uint16)
+    #lut = np.ones(max(bint)+1, dtype=np.int32)*-1
+    #lut[bint] = np.arange(basis.shape[0])
+    #cdef np.int32_t  [:] cy_lut = lut
+
+    state_np =  np.zeros(L, dtype=data_type)
+    sp_np =  np.zeros(L, dtype=data_type)
+    spp_np =  np.zeros(L, dtype=data_type)
+    cdef data_type_t [:] state = state_np
+    cdef data_type_t [:] sp = sp_np
+    cdef data_type_t [:] spp = spp_np
+
+    cdef np.complex64_t [:,:,:,:] rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
+
+    for i in prange(Nstates, nogil=True):
+        state[:] = basis[i,:]
+        for j in range(Ldwn):
+            for k in range(Ldwn):
+                sp[:] = state
+                #check if two states j and k are occupied
+                f1 = c_(sp, j, sigd, Ldwn)
+                f2 = c_dagger(sp, k, sigc, Ldwn)
+                if f1!=0 and f2 !=0:
+                    for l in range(Ldwn):
+                        for m in range(Ldwn):
+                            spp[:] = sp
+                            f3 = c_(spp, l, sigb, Ldwn)
+                            f4 = c_dagger(spp, m, siga, Ldwn)
+                            if f3!=0 and f4 !=0:
+                                idx = cy_lut[state_to_int(spp,L)]
+                                if idx > -1:
+                                    rho[m,l,k,j] += f1*f2*f3*f4*(state_vec[i].conjugate())*state_vec[idx]
+
+
+    return np.asarray(rho)
+
+@cython.boundscheck(False) # turn off bounds-checking for entire function
+@cython.wraparound(False)  # turn off negative index wrapping for entire function
+cpdef inline void copy_state(data_type_t [:] source, data_type_t [:] dest, int L):
+    for i in range(L):
+        dest[i] = source[i]
+
+
+@cython.boundscheck(False) # turn off bounds-checking for entire function
+@cython.wraparound(False)  # turn off negative index wrapping for entire function
+def expectation_quad_test_par2(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t  [:] cy_lut, np.int32_t siga, np.int32_t sigb, np.int32_t sigc, np.int32_t sigd, np.uint32_t Ldwn, int num_threads):
+    """
+    Computes the density matrix \rho_ijkl^(spina, spinb, spinc, spind)
+    :param basis: all basis states, shape [Nstates, mtotal]
+    :param Ldwn: cutoff for one spin sector
+    :return: \rho_ijkl
+    """
+
+    cdef Py_ssize_t Nstates = basis.shape[0]
+    cdef Py_ssize_t L = basis.shape[1]
+    cdef int i,j,k,l,m,f1,f2,f3,f4,idx
+
+    #state_np =  np.zeros(L, dtype=data_type)
+    # pad local data to 64 byte avoid false sharing of cache-lines
+    cdef int L_padded = (((L - 1) // 64) + 1) * 64
+    #cdef int L_padded = L
+
+    cdef data_type_t* state = <data_type_t*>malloc(L_padded * num_threads * sizeof(data_type))
+    cdef data_type_t* sp = <data_type_t*>malloc(L_padded * num_threads * sizeof(data_type))
+    cdef data_type_t* spp = <data_type_t*>malloc(L_padded * num_threads * sizeof(data_type))
+    cdef data_type_t* state_t
+    cdef data_type_t* sp_t
+    cdef data_type_t* spp_t
+
+    cdef np.complex64_t [:,:,:,:] rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
+
+    with nogil, parallel(num_threads=num_threads):
+        #get local buffers for each thread
+        state_t = state + threadid() * L_padded
+        sp_t = sp + threadid() * L_padded
+        spp_t = spp + threadid() * L_padded
+
+        for i in prange(Nstates):
+            #state[:] = basis[i,:]
+            copy_state(basis[i,:],state_t,L_padded)
+            for j in range(Ldwn):
+                for k in range(Ldwn):
+                    #sp[:] = state
+                    copy_state(state_t,sp_t,L_padded)
+                    #check if two states j and k are occupied
+                    f1 = c_(sp_t, j, sigd, Ldwn)
+                    f2 = c_dagger(sp_t, k, sigc, Ldwn)
+                    if f1!=0 and f2 !=0:
+                        for l in range(Ldwn):
+                            for m in range(Ldwn):
+                                #spp[:] = sp
+                                copy_state(sp_t,spp_t,L_padded)
+                                f3 = c_(spp_t, l, sigb, Ldwn)
+                                f4 = c_dagger(spp_t, m, siga, Ldwn)
+                                if f3!=0 and f4 !=0:
+                                    idx = cy_lut[state_to_int(spp_t,L)]
+                                    if idx > -1:
+                                        rho[m,l,k,j] += f1*f2*f3*f4*(state_vec[i].conjugate())*state_vec[idx]
+
+
+    return np.asarray(rho)
+
+@cython.boundscheck(False) # turn off bounds-checking for entire function
+@cython.wraparound(False)  # turn off negative index wrapping for entire function
+def expectation_six_par(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t [:] cy_lut, np.int32_t siga, np.int32_t sigb, np.int32_t sigc, np.int32_t sigd, np.int32_t sige, np.int32_t sigf, np.uint32_t Ldwn):
+    """
+    Computes the density matrix \rho_ijklmn^(spina, spinb, spinc, spind, spine, spinf)
+    :param basis: all basis states, shape [Nstates, mtotal]
+    :param Ldwn: cutoff for one spin sector
+    :return: \rho_ijkl
+    """
+    cdef Py_ssize_t Nstates = basis.shape[0]
+    cdef Py_ssize_t L = basis.shape[1]
+    cdef int i,j,k,l,m,n,o,f1,f2,f3,f4,f5,f6,idx
+
+    state_np =  np.zeros(L, dtype=data_type)
+    sp_np =  np.zeros(L, dtype=data_type)
+    spp_np =  np.zeros(L, dtype=data_type)
+    sppp_np =  np.zeros(L, dtype=data_type)
+    cdef data_type_t [:] state = state_np
+    cdef data_type_t [:] sp = sp_np
+    cdef data_type_t [:] spp = spp_np
+    cdef data_type_t [:] sppp = sppp_np
+
+    cdef np.complex64_t [:,:,:,:,:,:] rho =  np.zeros((Ldwn,Ldwn,Ldwn,Ldwn,Ldwn,Ldwn), dtype=np.complex64)
+
+    for i in prange(Nstates, nogil=True):
+        state[:] = basis[i,:]
+        for j in range(Ldwn):
+            for k in range(Ldwn):
+                sp[:] = state
+                #check if two states j and k are occupied
+                f1 = c_(sp, j, sigf, Ldwn)
+                f2 = c_dagger(sp, k, sige, Ldwn)
+                if f1!=0 and f2 !=0:
+                    for l in range(Ldwn):
+                        for m in range(Ldwn):
+                            spp[:] = sp
+                            #check if two states j and k are occupied
+                            f3 = c_(spp, l, sigd, Ldwn)
+                            f4 = c_dagger(spp, m, sigc, Ldwn)
+                            if f3!=0 and f4!=0:
+                                for n in range(Ldwn):
+                                    for o in range(Ldwn):
+                                        sppp[:] = spp
+                                        f5 = c_(sppp, l, sigb, Ldwn)
+                                        f6 = c_dagger(sppp, m, siga, Ldwn)
+                                        if f5!=0 and f6!=0:
+                                            idx = cy_lut[state_to_int(sppp,L)]
+                                            if idx > -1:
+                                                rho[o,n,m,l,k,j] += f1*f2*f3*f4*f5*f6*(state_vec[i].conjugate())*state_vec[idx]
+
+    return np.asarray(rho)
