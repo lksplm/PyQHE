@@ -138,3 +138,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+pyqhe/cython/hamiltonian_cy.html~b26b4776b64396170384c29c6ba83c14f69160e2
+pyqhe/cython/hamiltonian_cy.cpp~b26b4776b64396170384c29c6ba83c14f69160e2
+pyqhe/cython/hamiltonian_cy.cp36-win_amd64.pyd~b26b4776b64396170384c29c6ba83c14f69160e2

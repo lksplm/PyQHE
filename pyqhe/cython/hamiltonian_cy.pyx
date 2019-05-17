@@ -2,9 +2,13 @@
 import numpy as np
 cimport numpy as np
 cimport cython
+<<<<<<< HEAD
 cimport openmp
 from cython.parallel cimport parallel, prange, threadid
 from libc.stdlib cimport malloc, free
+=======
+from cython.parallel import prange
+>>>>>>> b26b4776b64396170384c29c6ba83c14f69160e2
 
 from scipy.sparse import coo_matrix
 from libcpp.vector cimport vector
@@ -656,6 +660,7 @@ def expectation_quad_test_par(np.complex64_t [:] state_vec, data_type_t [:,:] ba
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
+<<<<<<< HEAD
 cpdef inline void copy_state(data_type_t [:] source, data_type_t [:] dest, int L):
     for i in range(L):
         dest[i] = source[i]
@@ -722,6 +727,8 @@ def expectation_quad_test_par2(np.complex64_t [:] state_vec, data_type_t [:,:] b
 
 @cython.boundscheck(False) # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
+=======
+>>>>>>> b26b4776b64396170384c29c6ba83c14f69160e2
 def expectation_six_par(np.complex64_t [:] state_vec, data_type_t [:,:] basis, np.int32_t [:] cy_lut, np.int32_t siga, np.int32_t sigb, np.int32_t sigc, np.int32_t sigd, np.int32_t sige, np.int32_t sigf, np.uint32_t Ldwn):
     """
     Computes the density matrix \rho_ijklmn^(spina, spinb, spinc, spind, spine, spinf)
