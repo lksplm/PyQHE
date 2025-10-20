@@ -170,7 +170,7 @@ class BasisFermi(Basis):
         m_total = int(np.sum(ms))
         basis = np.zeros((Nstates_total, m_total), dtype=np.uint8) #set up basis array
         st_fermi = product(*states_spin) #cartesian product between all components generates all states, still indices
-        basis_l = np.zeros(Nstates_total, dtype=np.int) #angular momentum "operator" (diagonal in this basis)/index per component
+        basis_l = np.zeros(Nstates_total, dtype=np.int64) #angular momentum "operator" (diagonal in this basis)/index per component
         self.offs_arr = np.insert(ms[:-1], 0, 0) #compute offsets for each component for indexing
         self.offs_arr_end = np.insert(ms[1:], -1, -1)
         l_diag = np.concatenate([np.arange(m) for m in ms])
