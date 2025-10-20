@@ -53,13 +53,41 @@ class BasisBose(Basis):
         self.basis, self.basis_l =  self._generate_basis()
         self.Nbasis = self.basis.shape[0]
         self.basis_lut = dict(zip(tuple(map(tuple, self.basis)), range(self.Nbasis)))
+        self._build_map()
 
     def _build_lut(self):
         self.basis_lut = dict(zip(tuple(map(tuple, self.basis)), range(self.Nbasis)))
 
+    def _build_map(self):
+        """
+        Build array-based lookup map for GIL-free bosonic state lookups.
+
+        Uses base-(N+1) encoding: state[0] + state[1]*(N+1) + state[2]*(N+1)^2 + ...
+        to convert occupation number vectors to unique integers.
+        """
+        from .cython.hamiltonian_bose_cy import state_to_int_bose
+        L = self.basis.shape[1]
+        max_occ = self.N  # Maximum occupation is N (all particles in one mode)
+
+        # Convert all basis states to integers
+        bint = np.array([state_to_int_bose(self.basis[i,:], L, max_occ)
+                         for i in range(self.basis.shape[0])], dtype=np.int64)
+
+        # Create lookup array: unoccupied sites get -1
+        lookup = np.ones(int(max(bint)) + 1, dtype=np.int32) * -1
+        lookup[bint] = np.arange(self.basis.shape[0], dtype=np.int32)
+        self._basis_map = lookup
+
+    @property
+    def lookup_map(self):
+        """Return the array-based lookup map for fast state lookups."""
+        if not hasattr(self, '_basis_map') or self._basis_map is None:
+            self._build_map()
+        return self._basis_map
+
     def _generate_basis(self):
-        s0 = np.zeros(self.m, dtype=np.int8)
-        states = np.empty((multichoose(self.m, self.N), self.m), dtype=np.int8)
+        s0 = np.zeros(self.m, dtype=np.uint8)
+        states = np.empty((multichoose(self.m, self.N), self.m), dtype=np.uint8)
         ls = np.empty(multichoose(self.m, self.N), dtype=np.uint)
         for i, idx in enumerate(combinations_with_replacement(range(self.m), self.N)):
             s = np.zeros(self.m, dtype=np.uint8)
