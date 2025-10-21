@@ -235,3 +235,100 @@ def quadratic_delta(data_type_t [:,:] basis, np.float64_t [:,:,:,:] coeff,
                                     val.push_back(coeff[m,l,k,j]*sqrt(f1*f2*f3*f4))
 
     return coo_matrix((val,(row,col)), dtype=np.float64, shape=(Nstates, Nstates))
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def expect_lin(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
+               np.int32_t [:] lut, int max_occ):
+    """
+    Computes the 1-particle bosonic density matrix ρ_ij = <ψ|b†_i b_j|ψ>
+
+    Uses GIL-free array-based lookup for performance.
+
+    :param state_vec: quantum state vector, shape [Nstates]
+    :param basis: all basis states, shape [Nstates, L]
+    :param lut: array-based lookup map from state integer to basis index
+    :param max_occ: maximum occupation per mode (N)
+    :return: ρ_ij, shape [L, L]
+    """
+    cdef Py_ssize_t Nstates = basis.shape[0]
+    cdef Py_ssize_t L = basis.shape[1]
+    cdef int i, j, k, idx
+    cdef int f1, f2
+    cdef long long state_int
+
+    state_np = np.zeros(L, dtype=data_type)
+    sp_np = np.zeros(L, dtype=data_type)
+    cdef data_type_t [:] state = state_np
+    cdef data_type_t [:] sp = sp_np
+
+    cdef np.complex64_t [:,:] rho = np.zeros((L, L), dtype=np.complex64)
+
+    for i in range(Nstates):
+        state[:] = basis[i,:]
+        for j in range(L):
+            sp[:] = state
+            f1 = b_(sp, j)
+            if f1 > 0:
+                for k in range(L):
+                    f2 = b_dagger(sp, k)
+                    if f2 > 0:
+                        state_int = state_to_int_bose(sp, L, max_occ)
+                        idx = lut[state_int]
+                        if idx > -1:
+                            rho[k, j] += sqrt(f1 * f2) * np.conj(state_vec[i]) * state_vec[idx]
+                    sp[:] = state  # reset for next k
+                    sp[j] -= 1  # reapply b_j
+
+    return np.asarray(rho)
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def expect_quad(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
+                np.int32_t [:] lut, int max_occ):
+    """
+    Computes the 2-particle bosonic density matrix ρ_ijkl = <ψ|b†_i b†_j b_k b_l|ψ>
+
+    Uses GIL-free array-based lookup for performance.
+
+    :param state_vec: quantum state vector, shape [Nstates]
+    :param basis: all basis states, shape [Nstates, L]
+    :param lut: array-based lookup map from state integer to basis index
+    :param max_occ: maximum occupation per mode (N)
+    :return: ρ_ijkl, shape [L, L, L, L]
+    """
+    cdef Py_ssize_t Nstates = basis.shape[0]
+    cdef Py_ssize_t L = basis.shape[1]
+    cdef int i, j, k, l, m, idx
+    cdef int f1, f2, f3, f4
+    cdef long long state_int
+
+    state_np = np.zeros(L, dtype=data_type)
+    sp_np = np.zeros(L, dtype=data_type)
+    spp_np = np.zeros(L, dtype=data_type)
+    cdef data_type_t [:] state = state_np
+    cdef data_type_t [:] sp = sp_np
+    cdef data_type_t [:] spp = spp_np
+
+    cdef np.complex64_t [:,:,:,:] rho = np.zeros((L, L, L, L), dtype=np.complex64)
+
+    for i in range(Nstates):
+        state[:] = basis[i,:]
+        for j in range(L):
+            for k in range(L):
+                sp[:] = state
+                f1 = b_(sp, j)
+                f2 = b_(sp, k)
+                if f1 > 0 and f2 > 0:
+                    for l in range(L):
+                        for m in range(L):
+                            spp[:] = sp
+                            f3 = b_dagger(spp, l)
+                            f4 = b_dagger(spp, m)
+                            if f3 > 0 and f4 > 0:
+                                state_int = state_to_int_bose(spp, L, max_occ)
+                                idx = lut[state_int]
+                                if idx > -1:
+                                    rho[m, l, k, j] += sqrt(f1*f2*f3*f4) * np.conj(state_vec[i]) * state_vec[idx]
+
+    return np.asarray(rho)
