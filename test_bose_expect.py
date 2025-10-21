@@ -2,14 +2,14 @@
 Test bosonic expectation value and density matrix functions.
 
 This test verifies:
-1. Correctness of expect_lin_bose and expect_quad_bose
+1. Correctness of expect_lin_bose, expect_quad_bose, and expect_six_bose
 2. Performance improvement vs legacy dict-based versions
 3. Physical properties (hermiticity, trace, etc.)
 """
 import numpy as np
 import time
 from pyqhe.basis import BasisBose
-from pyqhe.expectation import expect_lin_bose, expect_quad_bose
+from pyqhe.expectation import expect_lin_bose, expect_quad_bose, expect_six_bose
 from pyqhe.cython import legacy_bose
 
 print("=" * 70)
@@ -107,6 +107,42 @@ else:
 rho_transpose = np.transpose(rho_quad_new, (3, 2, 1, 0)).conj()
 is_hermitian = np.allclose(rho_quad_new, rho_transpose)
 print(f"\n  Hermitian: {is_hermitian}")
+
+print("\n" + "=" * 70)
+print("TEST 2.5: 3-Particle Density Matrix (expect_six_bose)")
+print("=" * 70)
+
+# Test 3: Six-operator expectation value (3-particle density matrix)
+# Note: This is computationally expensive (6 nested loops), so we use a very small system
+print("\nComputing ρ_ijklmn = <ψ|b†_i b†_j b†_k b_l b_m b_n|ψ>...")
+print("  (Using smaller system N=2, m=3 due to computational cost)")
+
+# Use a smaller system for the 6-operator test
+basis_small = BasisBose(2, 3)
+state_small = np.zeros(basis_small.basis.shape[0])
+state_small[0] = 1.0  # Simple ground state
+
+# New GIL-free version
+t0 = time.time()
+rho_six_new = expect_six_bose(state_small, basis_small)
+t_new = time.time() - t0
+print(f"  New (GIL-free) time: {t_new*1000:.3f} ms")
+print(f"  Shape: {rho_six_new.shape}")
+
+# Check basic properties
+# For the ground state (all in mode 0), most elements should be zero
+nonzero_elements = np.count_nonzero(np.abs(rho_six_new) > 1e-10)
+print(f"  Non-zero elements: {nonzero_elements} / {rho_six_new.size}")
+
+# Check hermiticity: ρ_ijklmn should equal ρ*_nmlkji
+rho_transpose = np.transpose(rho_six_new, (5, 4, 3, 2, 1, 0)).conj()
+is_hermitian = np.allclose(rho_six_new, rho_transpose)
+print(f"  Hermitian: {is_hermitian}")
+
+if is_hermitian:
+    print("  ✓ PASSED")
+else:
+    print("  ✗ FAILED")
 
 print("\n" + "=" * 70)
 print("TEST 3: Performance Scaling")

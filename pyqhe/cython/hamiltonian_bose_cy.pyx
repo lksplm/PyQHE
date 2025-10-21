@@ -332,3 +332,65 @@ def expect_quad(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
                                     rho[m, l, k, j] += sqrt(f1*f2*f3*f4) * np.conj(state_vec[i]) * state_vec[idx]
 
     return np.asarray(rho)
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def expect_six(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
+               np.int32_t [:] lut, int max_occ):
+    """
+    Computes the 3-particle bosonic density matrix ρ_ijklmn = <ψ|b†_i b†_j b†_k b_l b_m b_n|ψ>
+
+    Uses GIL-free array-based lookup for performance.
+
+    :param state_vec: quantum state vector, shape [Nstates]
+    :param basis: all basis states, shape [Nstates, L]
+    :param lut: array-based lookup map from state integer to basis index
+    :param max_occ: maximum occupation per mode (N)
+    :return: ρ_ijklmn, shape [L, L, L, L, L, L]
+    """
+    cdef Py_ssize_t Nstates = basis.shape[0]
+    cdef Py_ssize_t L = basis.shape[1]
+    cdef int i, j, k, l, m, n, o, idx
+    cdef int f1, f2, f3, f4, f5, f6
+    cdef long long state_int
+
+    state_np = np.zeros(L, dtype=data_type)
+    sp_np = np.zeros(L, dtype=data_type)
+    spp_np = np.zeros(L, dtype=data_type)
+    sppp_np = np.zeros(L, dtype=data_type)
+    cdef data_type_t [:] state = state_np
+    cdef data_type_t [:] sp = sp_np
+    cdef data_type_t [:] spp = spp_np
+    cdef data_type_t [:] sppp = sppp_np
+
+    cdef np.complex64_t [:,:,:,:,:,:] rho = np.zeros((L, L, L, L, L, L), dtype=np.complex64)
+
+    for i in range(Nstates):
+        state[:] = basis[i,:]
+        for j in range(L):
+            for k in range(L):
+                sp[:] = state
+                # Apply b_j and b†_k
+                f1 = b_(sp, j)
+                f2 = b_dagger(sp, k)
+                if f1 > 0 and f2 > 0:
+                    for l in range(L):
+                        for m in range(L):
+                            spp[:] = sp
+                            # Apply b_l and b†_m
+                            f3 = b_(spp, l)
+                            f4 = b_dagger(spp, m)
+                            if f3 > 0 and f4 > 0:
+                                for n in range(L):
+                                    for o in range(L):
+                                        sppp[:] = spp
+                                        # Apply b_n and b†_o
+                                        f5 = b_(sppp, n)
+                                        f6 = b_dagger(sppp, o)
+                                        if f5 > 0 and f6 > 0:
+                                            state_int = state_to_int_bose(sppp, L, max_occ)
+                                            idx = lut[state_int]
+                                            if idx > -1:
+                                                rho[o, n, m, l, k, j] += sqrt(f1*f2*f3*f4*f5*f6) * np.conj(state_vec[i]) * state_vec[idx]
+
+    return np.asarray(rho)

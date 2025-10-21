@@ -46,3 +46,18 @@ def expect_quad_bose(state, basis):
         basis.lookup_map,
         basis.N
     )
+
+def expect_six_bose(state, basis):
+    """
+    Compute 3-particle bosonic density matrix ρ_ijklmn = <ψ|b†_i b†_j b†_k b_l b_m b_n|ψ>
+
+    :param state: quantum state vector (will be converted to complex64)
+    :param basis: BasisBose object containing basis states and lookup map
+    :return: complex matrix of shape [m, m, m, m, m, m] where m is the number of modes
+    """
+    return hamiltonian_bose_cy.expect_six(
+        state.astype(np.complex64),
+        np.array(basis.basis, dtype=np.uint8),
+        basis.lookup_map,
+        basis.N
+    )
