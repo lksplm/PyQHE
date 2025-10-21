@@ -2,7 +2,7 @@
 """
 Test and benchmark GIL-free bosonic operators.
 
-Compares old dict-based lookup vs new array-based lookup.
+Compares legacy dict-based lookup vs new GIL-free array-based lookup.
 """
 import numpy as np
 from scipy.special import factorial
@@ -13,8 +13,8 @@ import sys
 sys.path.insert(0, '/home/user/PyQHE')
 
 from pyqhe.basis import BasisBose
-from pyqhe.hamiltonian_bose import (OperatorLinCy, OperatorLinCyFast,
-                                     OperatorQuadDeltaCy, OperatorQuadDeltaCyFast)
+from pyqhe.hamiltonian_bose import OperatorLinCy, OperatorQuadDeltaCy
+from pyqhe.cython import legacy_bose
 
 print("="*70)
 print("PyQHE Bosonic GIL-Free Lookup Test")
@@ -37,20 +37,27 @@ print("\n1. Testing Linear Operator (kinetic energy)...")
 diag_sites = [(i,i) for i in range(m)]
 coeff_l = lambda i, j: i*(i==j)
 
+# Prepare coefficient matrix
+coeff = np.zeros((m, m), dtype=np.float64)
+for i in range(m):
+    coeff[i,i] = i
+
 t0 = time.time()
-H0_old = OperatorLinCy(basis, site_indices=diag_sites, op_func=coeff_l)
+H0_legacy = legacy_bose.linear(np.array(basis.basis, dtype=np.uint8),
+                               np.array(diag_sites, dtype=np.uint32),
+                               coeff)
 t_old = time.time() - t0
 
 t0 = time.time()
-H0_fast = OperatorLinCyFast(basis, site_indices=diag_sites, op_func=coeff_l)
-t_fast = time.time() - t0
+H0_new = OperatorLinCy(basis, site_indices=diag_sites, op_func=coeff_l)
+t_new = time.time() - t0
 
-print(f"  Old (dict) time: {t_old*1000:.3f} ms")
-print(f"  Fast (array) time: {t_fast*1000:.3f} ms")
-print(f"  Speedup: {t_old/t_fast:.2f}x")
+print(f"  Legacy (dict) time: {t_old*1000:.3f} ms")
+print(f"  New (GIL-free) time: {t_new*1000:.3f} ms")
+print(f"  Speedup: {t_old/t_new:.2f}x")
 
 # Check if matrices are identical
-diff = (H0_old.matrix - H0_fast.matrix).todense()
+diff = (H0_legacy - H0_new.matrix).todense()
 max_diff = np.abs(diff).max()
 print(f"  Max difference: {max_diff:.2e}")
 print(f"  ✓ PASSED" if max_diff < 1e-14 else f"  ✗ FAILED")
@@ -68,24 +75,28 @@ for j, k, l, m_idx in int_sites:
     coeff[j, k, l, m_idx] = Vint(j, k, l, m_idx)
 
 t0 = time.time()
-Hint_old = OperatorQuadDeltaCy(basis, coeff=coeff)
+Hint_legacy = legacy_bose.quadratic_delta(np.array(basis.basis, dtype=np.uint8), coeff)
 t_old = time.time() - t0
 
 t0 = time.time()
-Hint_fast = OperatorQuadDeltaCyFast(basis, coeff=coeff)
-t_fast = time.time() - t0
+Hint_new = OperatorQuadDeltaCy(basis, coeff=coeff)
+t_new = time.time() - t0
 
-print(f"  Old (dict) time: {t_old*1000:.3f} ms")
-print(f"  Fast (array) time: {t_fast*1000:.3f} ms")
-print(f"  Speedup: {t_old/t_fast:.2f}x")
+print(f"  Legacy (dict) time: {t_old*1000:.3f} ms")
+print(f"  New (GIL-free) time: {t_new*1000:.3f} ms")
+print(f"  Speedup: {t_old/t_new:.2f}x")
 
-diff = (Hint_old.matrix - Hint_fast.matrix).todense()
+diff = (Hint_legacy - Hint_new.matrix).todense()
 max_diff = np.abs(diff).max()
 print(f"  Max difference: {max_diff:.2e}")
 print(f"  ✓ PASSED" if max_diff < 1e-14 else f"  ✗ FAILED")
 
-print(f"\n  H0 hermitian: {H0_fast.is_hermitian()}")
-print(f"  Hint hermitian: {Hint_fast.is_hermitian()}")
+# Use Operator wrapper to check hermiticity
+from pyqhe.hamiltonian import Operator
+H0_op = Operator(H0_new.matrix)
+Hint_op = Operator(Hint_new.matrix)
+print(f"\n  H0 hermitian: {H0_op.is_hermitian()}")
+print(f"  Hint hermitian: {Hint_op.is_hermitian()}")
 
 # Test 2: Performance benchmark with larger system
 print("\n" + "="*70)
@@ -93,24 +104,31 @@ print("TEST 2: Performance Benchmark")
 print("="*70)
 
 sizes = [(3, 6), (4, 6), (4, 8), (5, 8)]
-print(f"\n{'N':>3} {'m':>3} {'Basis':>8} {'Old (ms)':>10} {'Fast (ms)':>10} {'Speedup':>8}")
+print(f"\n{'N':>3} {'m':>3} {'Basis':>8} {'Legacy (ms)':>12} {'New (ms)':>10} {'Speedup':>8}")
 print("-"*70)
 
 for N, m in sizes:
     basis = BasisBose(N=N, m=m)
     diag_sites = [(i,i) for i in range(m)]
 
+    # Prepare coefficient matrix
+    coeff = np.zeros((m, m), dtype=np.float64)
+    for i in range(m):
+        coeff[i,i] = i
+
     # Benchmark linear operator
     t0 = time.time()
-    H_old = OperatorLinCy(basis, site_indices=diag_sites, op_func=lambda i,j: i*(i==j))
+    H_legacy = legacy_bose.linear(np.array(basis.basis, dtype=np.uint8),
+                                  np.array(diag_sites, dtype=np.uint32),
+                                  coeff)
     t_old = (time.time() - t0) * 1000
 
     t0 = time.time()
-    H_fast = OperatorLinCyFast(basis, site_indices=diag_sites, op_func=lambda i,j: i*(i==j))
-    t_fast = (time.time() - t0) * 1000
+    H_new = OperatorLinCy(basis, site_indices=diag_sites, op_func=lambda i,j: i*(i==j))
+    t_new = (time.time() - t0) * 1000
 
-    speedup = t_old / t_fast
-    print(f"{N:3d} {m:3d} {basis.Nbasis:8d} {t_old:10.3f} {t_fast:10.3f} {speedup:8.2f}x")
+    speedup = t_old / t_new
+    print(f"{N:3d} {m:3d} {basis.Nbasis:8d} {t_old:12.3f} {t_new:10.3f} {speedup:8.2f}x")
 
 # Test 3: Verify state_to_int encoding
 print("\n" + "="*70)

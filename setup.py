@@ -6,6 +6,7 @@ import numpy as np
 extensions = [
     Extension('pyqhe.cython.hamiltonian_cy', ['pyqhe/cython/hamiltonian_cy.pyx'], extra_compile_args=['-fopenmp'], extra_link_args=['-fopenmp'], include_dirs = [np.get_include()],language="c++"),
     Extension('pyqhe.cython.hamiltonian_bose_cy', ['pyqhe/cython/hamiltonian_bose_cy.pyx'], include_dirs = [np.get_include()],language="c++"),
+    Extension('pyqhe.cython.legacy_bose', ['pyqhe/cython/legacy_bose.pyx'], include_dirs = [np.get_include()],language="c++"),
     ]
 
 
