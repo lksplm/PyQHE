@@ -15,6 +15,14 @@ from libc.math cimport sqrt
 data_type = np.uint8
 ctypedef np.uint8_t data_type_t
 
+# GIL-free complex conjugate for numpy complex64
+cdef inline np.complex64_t conj_complex64(np.complex64_t z) noexcept nogil:
+    """Complex conjugate without requiring GIL"""
+    cdef np.complex64_t result
+    result.real = z.real
+    result.imag = -z.imag
+    return result
+
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -276,7 +284,7 @@ def expect_lin(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
                         state_int = state_to_int_bose(sp, L, max_occ)
                         idx = lut[state_int]
                         if idx > -1:
-                            rho[k, j] += sqrt(f1 * f2) * np.conj(state_vec[i]) * state_vec[idx]
+                            rho[k, j] += sqrt(f1 * f2) * conj_complex64(state_vec[i]) * state_vec[idx]
                     sp[:] = state  # reset for next k
                     sp[j] -= 1  # reapply b_j
 
@@ -329,7 +337,7 @@ def expect_quad(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
                                 state_int = state_to_int_bose(spp, L, max_occ)
                                 idx = lut[state_int]
                                 if idx > -1:
-                                    rho[m, l, k, j] += sqrt(f1*f2*f3*f4) * np.conj(state_vec[i]) * state_vec[idx]
+                                    rho[m, l, k, j] += sqrt(f1*f2*f3*f4) * conj_complex64(state_vec[i]) * state_vec[idx]
 
     return np.asarray(rho)
 
@@ -391,6 +399,6 @@ def expect_six(np.complex64_t [:] state_vec, data_type_t [:,:] basis,
                                             state_int = state_to_int_bose(sppp, L, max_occ)
                                             idx = lut[state_int]
                                             if idx > -1:
-                                                rho[o, n, m, l, k, j] += sqrt(f1*f2*f3*f4*f5*f6) * np.conj(state_vec[i]) * state_vec[idx]
+                                                rho[o, n, m, l, k, j] += sqrt(f1*f2*f3*f4*f5*f6) * conj_complex64(state_vec[i]) * state_vec[idx]
 
     return np.asarray(rho)
