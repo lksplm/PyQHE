@@ -35,6 +35,7 @@ pyqhe/__pycache__/
 pyqhe/cython/__pycache__/
 pyqhe/cython/*.html
 pyqhe/cython/*.cpp
+pyqhe/cython/*.c
 
 
 
